@@ -2658,10 +2658,10 @@ function diff_attributes(loop$controlled, loop$path, loop$mapper, loop$events, l
     let mapper = loop$mapper;
     let events = loop$events;
     let old = loop$old;
-    let new$10 = loop$new;
+    let new$11 = loop$new;
     let added = loop$added;
     let removed = loop$removed;
-    if (new$10 instanceof Empty) {
+    if (new$11 instanceof Empty) {
       if (old instanceof Empty) {
         return new AttributeChange(added, removed, events);
       } else {
@@ -2677,7 +2677,7 @@ function diff_attributes(loop$controlled, loop$path, loop$mapper, loop$events, l
           loop$mapper = mapper;
           loop$events = events$1;
           loop$old = old$1;
-          loop$new = new$10;
+          loop$new = new$11;
           loop$added = added;
           loop$removed = removed$1;
         } else {
@@ -2689,16 +2689,16 @@ function diff_attributes(loop$controlled, loop$path, loop$mapper, loop$events, l
           loop$mapper = mapper;
           loop$events = events;
           loop$old = old$1;
-          loop$new = new$10;
+          loop$new = new$11;
           loop$added = added;
           loop$removed = removed$1;
         }
       }
     } else if (old instanceof Empty) {
-      let $ = new$10.head;
+      let $ = new$11.head;
       if ($ instanceof Event2) {
         let next = $;
-        let new$1 = new$10.tail;
+        let new$1 = new$11.tail;
         let name = $.name;
         let handler = $.handler;
         let added$1 = prepend(next, added);
@@ -2713,7 +2713,7 @@ function diff_attributes(loop$controlled, loop$path, loop$mapper, loop$events, l
         loop$removed = removed;
       } else {
         let next = $;
-        let new$1 = new$10.tail;
+        let new$1 = new$11.tail;
         let added$1 = prepend(next, added);
         loop$controlled = controlled;
         loop$path = path;
@@ -2725,8 +2725,8 @@ function diff_attributes(loop$controlled, loop$path, loop$mapper, loop$events, l
         loop$removed = removed;
       }
     } else {
-      let next = new$10.head;
-      let remaining_new = new$10.tail;
+      let next = new$11.head;
+      let remaining_new = new$11.tail;
       let prev = old.head;
       let remaining_old = old.tail;
       let $ = compare3(prev, next);
@@ -2740,7 +2740,7 @@ function diff_attributes(loop$controlled, loop$path, loop$mapper, loop$events, l
           loop$mapper = mapper;
           loop$events = events$1;
           loop$old = remaining_old;
-          loop$new = new$10;
+          loop$new = new$11;
           loop$added = added;
           loop$removed = removed$1;
         } else {
@@ -2750,7 +2750,7 @@ function diff_attributes(loop$controlled, loop$path, loop$mapper, loop$events, l
           loop$mapper = mapper;
           loop$events = events;
           loop$old = remaining_old;
-          loop$new = new$10;
+          loop$new = new$11;
           loop$added = added;
           loop$removed = removed$1;
         }
@@ -2933,7 +2933,7 @@ function do_diff(loop$old, loop$old_keyed, loop$new, loop$new_keyed, loop$moved,
   while (true) {
     let old = loop$old;
     let old_keyed = loop$old_keyed;
-    let new$10 = loop$new;
+    let new$11 = loop$new;
     let new_keyed = loop$new_keyed;
     let moved = loop$moved;
     let moved_offset = loop$moved_offset;
@@ -2945,7 +2945,7 @@ function do_diff(loop$old, loop$old_keyed, loop$new, loop$new_keyed, loop$moved,
     let children = loop$children;
     let mapper = loop$mapper;
     let events = loop$events;
-    if (new$10 instanceof Empty) {
+    if (new$11 instanceof Empty) {
       if (old instanceof Empty) {
         return new Diff(
           new Patch(patch_index, removed, changes, children),
@@ -2965,7 +2965,7 @@ function do_diff(loop$old, loop$old_keyed, loop$new, loop$new_keyed, loop$moved,
         let events$1 = remove_child(events, path, node_index, prev);
         loop$old = old$1;
         loop$old_keyed = old_keyed;
-        loop$new = new$10;
+        loop$new = new$11;
         loop$new_keyed = new_keyed;
         loop$moved = moved;
         loop$moved_offset = moved_offset;
@@ -2984,19 +2984,19 @@ function do_diff(loop$old, loop$old_keyed, loop$new, loop$new_keyed, loop$moved,
         mapper,
         path,
         node_index,
-        new$10
+        new$11
       );
-      let insert5 = insert4(new$10, node_index - moved_offset);
+      let insert5 = insert4(new$11, node_index - moved_offset);
       let changes$1 = prepend(insert5, changes);
       return new Diff(
         new Patch(patch_index, removed, changes$1, children),
         events$1
       );
     } else {
-      let next = new$10.head;
+      let next = new$11.head;
       let prev = old.head;
       if (prev.key !== next.key) {
-        let new_remaining = new$10.tail;
+        let new_remaining = new$11.tail;
         let old_remaining = old.tail;
         let next_did_exist = get(old_keyed, next.key);
         let prev_does_exist = get(new_keyed, prev.key);
@@ -3006,7 +3006,7 @@ function do_diff(loop$old, loop$old_keyed, loop$new, loop$new_keyed, loop$moved,
             if (prev_has_moved) {
               loop$old = old_remaining;
               loop$old_keyed = old_keyed;
-              loop$new = new$10;
+              loop$new = new$11;
               loop$new_keyed = new_keyed;
               loop$moved = moved;
               loop$moved_offset = moved_offset - advance(prev);
@@ -3028,7 +3028,7 @@ function do_diff(loop$old, loop$old_keyed, loop$new, loop$new_keyed, loop$moved,
               let moved_offset$1 = moved_offset + count;
               loop$old = prepend(match, old);
               loop$old_keyed = old_keyed;
-              loop$new = new$10;
+              loop$new = new$11;
               loop$new_keyed = new_keyed;
               loop$moved = moved$1;
               loop$moved_offset = moved_offset$1;
@@ -3049,7 +3049,7 @@ function do_diff(loop$old, loop$old_keyed, loop$new, loop$new_keyed, loop$moved,
             let changes$1 = prepend(remove3, changes);
             loop$old = old_remaining;
             loop$old_keyed = old_keyed;
-            loop$new = new$10;
+            loop$new = new$11;
             loop$new_keyed = new_keyed;
             loop$moved = moved;
             loop$moved_offset = moved_offset$1;
@@ -3119,10 +3119,10 @@ function do_diff(loop$old, loop$old_keyed, loop$new, loop$new_keyed, loop$moved,
       } else {
         let $ = old.head;
         if ($ instanceof Fragment) {
-          let $1 = new$10.head;
+          let $1 = new$11.head;
           if ($1 instanceof Fragment) {
             let next$1 = $1;
-            let new$1 = new$10.tail;
+            let new$1 = new$11.tail;
             let prev$1 = $;
             let old$1 = old.tail;
             let node_index$1 = node_index + 1;
@@ -3174,7 +3174,7 @@ function do_diff(loop$old, loop$old_keyed, loop$new, loop$new_keyed, loop$moved,
             loop$events = child.events;
           } else {
             let next$1 = $1;
-            let new_remaining = new$10.tail;
+            let new_remaining = new$11.tail;
             let prev$1 = $;
             let old_remaining = old.tail;
             let prev_count = advance(prev$1);
@@ -3211,12 +3211,12 @@ function do_diff(loop$old, loop$old_keyed, loop$new, loop$new_keyed, loop$moved,
             loop$events = events$1;
           }
         } else if ($ instanceof Element) {
-          let $1 = new$10.head;
+          let $1 = new$11.head;
           if ($1 instanceof Element) {
             let next$1 = $1;
             let prev$1 = $;
             if (prev$1.namespace === next$1.namespace && prev$1.tag === next$1.tag) {
-              let new$1 = new$10.tail;
+              let new$1 = new$11.tail;
               let old$1 = old.tail;
               let composed_mapper = compose_mapper(
                 mapper,
@@ -3304,7 +3304,7 @@ function do_diff(loop$old, loop$old_keyed, loop$new, loop$new_keyed, loop$moved,
               loop$events = child.events;
             } else {
               let next$2 = $1;
-              let new_remaining = new$10.tail;
+              let new_remaining = new$11.tail;
               let prev$2 = $;
               let old_remaining = old.tail;
               let prev_count = advance(prev$2);
@@ -3347,7 +3347,7 @@ function do_diff(loop$old, loop$old_keyed, loop$new, loop$new_keyed, loop$moved,
             }
           } else {
             let next$1 = $1;
-            let new_remaining = new$10.tail;
+            let new_remaining = new$11.tail;
             let prev$1 = $;
             let old_remaining = old.tail;
             let prev_count = advance(prev$1);
@@ -3384,12 +3384,12 @@ function do_diff(loop$old, loop$old_keyed, loop$new, loop$new_keyed, loop$moved,
             loop$events = events$1;
           }
         } else if ($ instanceof Text) {
-          let $1 = new$10.head;
+          let $1 = new$11.head;
           if ($1 instanceof Text) {
             let next$1 = $1;
             let prev$1 = $;
             if (prev$1.content === next$1.content) {
-              let new$1 = new$10.tail;
+              let new$1 = new$11.tail;
               let old$1 = old.tail;
               loop$old = old$1;
               loop$old_keyed = old_keyed;
@@ -3407,7 +3407,7 @@ function do_diff(loop$old, loop$old_keyed, loop$new, loop$new_keyed, loop$moved,
               loop$events = events;
             } else {
               let next$2 = $1;
-              let new$1 = new$10.tail;
+              let new$1 = new$11.tail;
               let old$1 = old.tail;
               let child = new$4(
                 node_index,
@@ -3432,7 +3432,7 @@ function do_diff(loop$old, loop$old_keyed, loop$new, loop$new_keyed, loop$moved,
             }
           } else {
             let next$1 = $1;
-            let new_remaining = new$10.tail;
+            let new_remaining = new$11.tail;
             let prev$1 = $;
             let old_remaining = old.tail;
             let prev_count = advance(prev$1);
@@ -3469,10 +3469,10 @@ function do_diff(loop$old, loop$old_keyed, loop$new, loop$new_keyed, loop$moved,
             loop$events = events$1;
           }
         } else {
-          let $1 = new$10.head;
+          let $1 = new$11.head;
           if ($1 instanceof UnsafeInnerHtml) {
             let next$1 = $1;
-            let new$1 = new$10.tail;
+            let new$1 = new$11.tail;
             let prev$1 = $;
             let old$1 = old.tail;
             let composed_mapper = compose_mapper(mapper, next$1.mapper);
@@ -3538,7 +3538,7 @@ function do_diff(loop$old, loop$old_keyed, loop$new, loop$new_keyed, loop$moved,
             loop$events = events$1;
           } else {
             let next$1 = $1;
-            let new_remaining = new$10.tail;
+            let new_remaining = new$11.tail;
             let prev$1 = $;
             let old_remaining = old.tail;
             let prev_count = advance(prev$1);
@@ -3579,11 +3579,11 @@ function do_diff(loop$old, loop$old_keyed, loop$new, loop$new_keyed, loop$moved,
     }
   }
 }
-function diff(events, old, new$10) {
+function diff(events, old, new$11) {
   return do_diff(
     toList([old]),
     empty2(),
-    toList([new$10]),
+    toList([new$11]),
     empty2(),
     empty_set(),
     0,
@@ -4683,51 +4683,6 @@ function start3(app, selector, start_args) {
   );
 }
 
-// build/dev/javascript/lustre/lustre/event.mjs
-function is_immediate_event(name) {
-  if (name === "input") {
-    return true;
-  } else if (name === "change") {
-    return true;
-  } else if (name === "focus") {
-    return true;
-  } else if (name === "focusin") {
-    return true;
-  } else if (name === "focusout") {
-    return true;
-  } else if (name === "blur") {
-    return true;
-  } else if (name === "select") {
-    return true;
-  } else {
-    return false;
-  }
-}
-function on(name, handler) {
-  return event(
-    name,
-    handler,
-    empty_list,
-    false,
-    false,
-    is_immediate_event(name),
-    0,
-    0
-  );
-}
-function on_input(msg) {
-  return on(
-    "input",
-    subfield(
-      toList(["target", "value"]),
-      string2,
-      (value2) => {
-        return success(msg(value2));
-      }
-    )
-  );
-}
-
 // build/dev/javascript/cypher_char_sheet/character/statpool.mjs
 var StatPool = class extends CustomType {
   constructor(max2, current) {
@@ -4736,7 +4691,7 @@ var StatPool = class extends CustomType {
     this.current = current;
   }
 };
-function new$8() {
+function new$7() {
   return new StatPool(0, 0);
 }
 
@@ -4823,7 +4778,7 @@ var UpdateSpeedEdge = class extends CustomType {
     this[0] = $0;
   }
 };
-function new$9() {
+function new$8() {
   return new Character(
     "",
     "",
@@ -4832,11 +4787,11 @@ function new$9() {
     1,
     1,
     0,
-    new$8(),
+    new$7(),
     0,
-    new$8(),
+    new$7(),
     0,
-    new$8(),
+    new$7(),
     0,
     toList([]),
     toList([]),
@@ -5090,27 +5045,69 @@ function handle_character_update(character, msg) {
   }
 }
 
-// build/dev/javascript/cypher_char_sheet/cypher_char_sheet.mjs
-var FILEPATH = "src/cypher_char_sheet.gleam";
+// build/dev/javascript/cypher_char_sheet/model.mjs
 var Model = class extends CustomType {
   constructor(character) {
     super();
     this.character = character;
   }
 };
+function new$9() {
+  return new Model(new$8());
+}
+
+// build/dev/javascript/lustre/lustre/event.mjs
+function is_immediate_event(name) {
+  if (name === "input") {
+    return true;
+  } else if (name === "change") {
+    return true;
+  } else if (name === "focus") {
+    return true;
+  } else if (name === "focusin") {
+    return true;
+  } else if (name === "focusout") {
+    return true;
+  } else if (name === "blur") {
+    return true;
+  } else if (name === "select") {
+    return true;
+  } else {
+    return false;
+  }
+}
+function on(name, handler) {
+  return event(
+    name,
+    handler,
+    empty_list,
+    false,
+    false,
+    is_immediate_event(name),
+    0,
+    0
+  );
+}
+function on_input(msg) {
+  return on(
+    "input",
+    subfield(
+      toList(["target", "value"]),
+      string2,
+      (value2) => {
+        return success(msg(value2));
+      }
+    )
+  );
+}
+
+// build/dev/javascript/cypher_char_sheet/ui.mjs
 var UserUpdatesCharacter = class extends CustomType {
   constructor($0) {
     super();
     this[0] = $0;
   }
 };
-function init(_) {
-  return new Model(new$9());
-}
-function update2(model, msg) {
-  let update_msg = msg[0];
-  return new Model(handle_character_update(model.character, update_msg));
-}
 function view_character_core(model) {
   return div(
     toList([class$("container-xl")]),
@@ -5131,6 +5128,16 @@ function view_character_core(model) {
     ])
   );
 }
+
+// build/dev/javascript/cypher_char_sheet/cypher_char_sheet.mjs
+var FILEPATH = "src/cypher_char_sheet.gleam";
+function init(_) {
+  return new$9();
+}
+function update2(model, msg) {
+  let update_msg = msg[0];
+  return new Model(handle_character_update(model.character, update_msg));
+}
 function view(model) {
   return view_character_core(model);
 }
@@ -5142,10 +5149,10 @@ function main() {
       "let_assert",
       FILEPATH,
       "cypher_char_sheet",
-      14,
+      10,
       "main",
       "Pattern match failed, no pattern matched the value.",
-      { value: $, start: 381, end: 430, pattern_start: 392, pattern_end: 397 }
+      { value: $, start: 201, end: 250, pattern_start: 212, pattern_end: 217 }
     );
   }
   return void 0;

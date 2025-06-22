@@ -1,13 +1,9 @@
-// IMPORTS ---------------------------------------------------------------------
-
 import character/core as char
 import lustre
-import lustre/attribute
 import lustre/element.{type Element}
-import lustre/element/html
-import lustre/event
 
-// MAIN ------------------------------------------------------------------------
+import model.{type Model, Model}
+import ui.{type Msg}
 
 pub fn main() {
   let app = lustre.simple(init, update, view)
@@ -16,43 +12,17 @@ pub fn main() {
   Nil
 }
 
-// MODEL ----------------------------------------------------------------------
-
-pub type Model {
-  Model(character: char.Character)
-}
-
 fn init(_args) -> Model {
-  Model(character: char.new())
-}
-
-// UPDATE ----------------------------------------------------------------------
-
-type Msg {
-  UserUpdatesCharacter(char.CharacterUpdateMsg)
+  model.new()
 }
 
 fn update(model: Model, msg: Msg) -> Model {
   case msg {
-    UserUpdatesCharacter(update_msg) ->
+    ui.UserUpdatesCharacter(update_msg) ->
       Model(character: char.handle_character_update(model.character, update_msg))
   }
 }
 
-// VIEW ------------------------------------------------------------------------
-
 fn view(model: Model) -> Element(Msg) {
-  view_character_core(model)
-}
-
-fn view_character_core(model: Model) -> Element(Msg) {
-  html.div([attribute.class("container-xl")], [
-    html.input([
-      attribute.class("m-4 border-black border rounded-sm"),
-      attribute.type_("text"),
-      attribute.value(model.character.name),
-      event.on_input(fn(value) { UserUpdatesCharacter(char.UpdateName(value)) }),
-    ]),
-    html.div([], [html.text(model.character.name)]),
-  ])
+  ui.view_character_core(model)
 }
