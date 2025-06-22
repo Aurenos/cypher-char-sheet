@@ -2082,6 +2082,9 @@ function event(name, handler, include, prevent_default, stop_propagation, immedi
 function attribute2(name, value2) {
   return attribute(name, value2);
 }
+function class$(name) {
+  return attribute2("class", name);
+}
 function type_(control_type) {
   return attribute2("type", control_type);
 }
@@ -2655,10 +2658,10 @@ function diff_attributes(loop$controlled, loop$path, loop$mapper, loop$events, l
     let mapper = loop$mapper;
     let events = loop$events;
     let old = loop$old;
-    let new$9 = loop$new;
+    let new$10 = loop$new;
     let added = loop$added;
     let removed = loop$removed;
-    if (new$9 instanceof Empty) {
+    if (new$10 instanceof Empty) {
       if (old instanceof Empty) {
         return new AttributeChange(added, removed, events);
       } else {
@@ -2674,7 +2677,7 @@ function diff_attributes(loop$controlled, loop$path, loop$mapper, loop$events, l
           loop$mapper = mapper;
           loop$events = events$1;
           loop$old = old$1;
-          loop$new = new$9;
+          loop$new = new$10;
           loop$added = added;
           loop$removed = removed$1;
         } else {
@@ -2686,16 +2689,16 @@ function diff_attributes(loop$controlled, loop$path, loop$mapper, loop$events, l
           loop$mapper = mapper;
           loop$events = events;
           loop$old = old$1;
-          loop$new = new$9;
+          loop$new = new$10;
           loop$added = added;
           loop$removed = removed$1;
         }
       }
     } else if (old instanceof Empty) {
-      let $ = new$9.head;
+      let $ = new$10.head;
       if ($ instanceof Event2) {
         let next = $;
-        let new$1 = new$9.tail;
+        let new$1 = new$10.tail;
         let name = $.name;
         let handler = $.handler;
         let added$1 = prepend(next, added);
@@ -2710,7 +2713,7 @@ function diff_attributes(loop$controlled, loop$path, loop$mapper, loop$events, l
         loop$removed = removed;
       } else {
         let next = $;
-        let new$1 = new$9.tail;
+        let new$1 = new$10.tail;
         let added$1 = prepend(next, added);
         loop$controlled = controlled;
         loop$path = path;
@@ -2722,8 +2725,8 @@ function diff_attributes(loop$controlled, loop$path, loop$mapper, loop$events, l
         loop$removed = removed;
       }
     } else {
-      let next = new$9.head;
-      let remaining_new = new$9.tail;
+      let next = new$10.head;
+      let remaining_new = new$10.tail;
       let prev = old.head;
       let remaining_old = old.tail;
       let $ = compare3(prev, next);
@@ -2737,7 +2740,7 @@ function diff_attributes(loop$controlled, loop$path, loop$mapper, loop$events, l
           loop$mapper = mapper;
           loop$events = events$1;
           loop$old = remaining_old;
-          loop$new = new$9;
+          loop$new = new$10;
           loop$added = added;
           loop$removed = removed$1;
         } else {
@@ -2747,7 +2750,7 @@ function diff_attributes(loop$controlled, loop$path, loop$mapper, loop$events, l
           loop$mapper = mapper;
           loop$events = events;
           loop$old = remaining_old;
-          loop$new = new$9;
+          loop$new = new$10;
           loop$added = added;
           loop$removed = removed$1;
         }
@@ -2930,7 +2933,7 @@ function do_diff(loop$old, loop$old_keyed, loop$new, loop$new_keyed, loop$moved,
   while (true) {
     let old = loop$old;
     let old_keyed = loop$old_keyed;
-    let new$9 = loop$new;
+    let new$10 = loop$new;
     let new_keyed = loop$new_keyed;
     let moved = loop$moved;
     let moved_offset = loop$moved_offset;
@@ -2942,7 +2945,7 @@ function do_diff(loop$old, loop$old_keyed, loop$new, loop$new_keyed, loop$moved,
     let children = loop$children;
     let mapper = loop$mapper;
     let events = loop$events;
-    if (new$9 instanceof Empty) {
+    if (new$10 instanceof Empty) {
       if (old instanceof Empty) {
         return new Diff(
           new Patch(patch_index, removed, changes, children),
@@ -2962,7 +2965,7 @@ function do_diff(loop$old, loop$old_keyed, loop$new, loop$new_keyed, loop$moved,
         let events$1 = remove_child(events, path, node_index, prev);
         loop$old = old$1;
         loop$old_keyed = old_keyed;
-        loop$new = new$9;
+        loop$new = new$10;
         loop$new_keyed = new_keyed;
         loop$moved = moved;
         loop$moved_offset = moved_offset;
@@ -2981,19 +2984,19 @@ function do_diff(loop$old, loop$old_keyed, loop$new, loop$new_keyed, loop$moved,
         mapper,
         path,
         node_index,
-        new$9
+        new$10
       );
-      let insert5 = insert4(new$9, node_index - moved_offset);
+      let insert5 = insert4(new$10, node_index - moved_offset);
       let changes$1 = prepend(insert5, changes);
       return new Diff(
         new Patch(patch_index, removed, changes$1, children),
         events$1
       );
     } else {
-      let next = new$9.head;
+      let next = new$10.head;
       let prev = old.head;
       if (prev.key !== next.key) {
-        let new_remaining = new$9.tail;
+        let new_remaining = new$10.tail;
         let old_remaining = old.tail;
         let next_did_exist = get(old_keyed, next.key);
         let prev_does_exist = get(new_keyed, prev.key);
@@ -3003,7 +3006,7 @@ function do_diff(loop$old, loop$old_keyed, loop$new, loop$new_keyed, loop$moved,
             if (prev_has_moved) {
               loop$old = old_remaining;
               loop$old_keyed = old_keyed;
-              loop$new = new$9;
+              loop$new = new$10;
               loop$new_keyed = new_keyed;
               loop$moved = moved;
               loop$moved_offset = moved_offset - advance(prev);
@@ -3025,7 +3028,7 @@ function do_diff(loop$old, loop$old_keyed, loop$new, loop$new_keyed, loop$moved,
               let moved_offset$1 = moved_offset + count;
               loop$old = prepend(match, old);
               loop$old_keyed = old_keyed;
-              loop$new = new$9;
+              loop$new = new$10;
               loop$new_keyed = new_keyed;
               loop$moved = moved$1;
               loop$moved_offset = moved_offset$1;
@@ -3046,7 +3049,7 @@ function do_diff(loop$old, loop$old_keyed, loop$new, loop$new_keyed, loop$moved,
             let changes$1 = prepend(remove3, changes);
             loop$old = old_remaining;
             loop$old_keyed = old_keyed;
-            loop$new = new$9;
+            loop$new = new$10;
             loop$new_keyed = new_keyed;
             loop$moved = moved;
             loop$moved_offset = moved_offset$1;
@@ -3116,10 +3119,10 @@ function do_diff(loop$old, loop$old_keyed, loop$new, loop$new_keyed, loop$moved,
       } else {
         let $ = old.head;
         if ($ instanceof Fragment) {
-          let $1 = new$9.head;
+          let $1 = new$10.head;
           if ($1 instanceof Fragment) {
             let next$1 = $1;
-            let new$1 = new$9.tail;
+            let new$1 = new$10.tail;
             let prev$1 = $;
             let old$1 = old.tail;
             let node_index$1 = node_index + 1;
@@ -3171,7 +3174,7 @@ function do_diff(loop$old, loop$old_keyed, loop$new, loop$new_keyed, loop$moved,
             loop$events = child.events;
           } else {
             let next$1 = $1;
-            let new_remaining = new$9.tail;
+            let new_remaining = new$10.tail;
             let prev$1 = $;
             let old_remaining = old.tail;
             let prev_count = advance(prev$1);
@@ -3208,12 +3211,12 @@ function do_diff(loop$old, loop$old_keyed, loop$new, loop$new_keyed, loop$moved,
             loop$events = events$1;
           }
         } else if ($ instanceof Element) {
-          let $1 = new$9.head;
+          let $1 = new$10.head;
           if ($1 instanceof Element) {
             let next$1 = $1;
             let prev$1 = $;
             if (prev$1.namespace === next$1.namespace && prev$1.tag === next$1.tag) {
-              let new$1 = new$9.tail;
+              let new$1 = new$10.tail;
               let old$1 = old.tail;
               let composed_mapper = compose_mapper(
                 mapper,
@@ -3301,7 +3304,7 @@ function do_diff(loop$old, loop$old_keyed, loop$new, loop$new_keyed, loop$moved,
               loop$events = child.events;
             } else {
               let next$2 = $1;
-              let new_remaining = new$9.tail;
+              let new_remaining = new$10.tail;
               let prev$2 = $;
               let old_remaining = old.tail;
               let prev_count = advance(prev$2);
@@ -3344,7 +3347,7 @@ function do_diff(loop$old, loop$old_keyed, loop$new, loop$new_keyed, loop$moved,
             }
           } else {
             let next$1 = $1;
-            let new_remaining = new$9.tail;
+            let new_remaining = new$10.tail;
             let prev$1 = $;
             let old_remaining = old.tail;
             let prev_count = advance(prev$1);
@@ -3381,12 +3384,12 @@ function do_diff(loop$old, loop$old_keyed, loop$new, loop$new_keyed, loop$moved,
             loop$events = events$1;
           }
         } else if ($ instanceof Text) {
-          let $1 = new$9.head;
+          let $1 = new$10.head;
           if ($1 instanceof Text) {
             let next$1 = $1;
             let prev$1 = $;
             if (prev$1.content === next$1.content) {
-              let new$1 = new$9.tail;
+              let new$1 = new$10.tail;
               let old$1 = old.tail;
               loop$old = old$1;
               loop$old_keyed = old_keyed;
@@ -3404,7 +3407,7 @@ function do_diff(loop$old, loop$old_keyed, loop$new, loop$new_keyed, loop$moved,
               loop$events = events;
             } else {
               let next$2 = $1;
-              let new$1 = new$9.tail;
+              let new$1 = new$10.tail;
               let old$1 = old.tail;
               let child = new$4(
                 node_index,
@@ -3429,7 +3432,7 @@ function do_diff(loop$old, loop$old_keyed, loop$new, loop$new_keyed, loop$moved,
             }
           } else {
             let next$1 = $1;
-            let new_remaining = new$9.tail;
+            let new_remaining = new$10.tail;
             let prev$1 = $;
             let old_remaining = old.tail;
             let prev_count = advance(prev$1);
@@ -3466,10 +3469,10 @@ function do_diff(loop$old, loop$old_keyed, loop$new, loop$new_keyed, loop$moved,
             loop$events = events$1;
           }
         } else {
-          let $1 = new$9.head;
+          let $1 = new$10.head;
           if ($1 instanceof UnsafeInnerHtml) {
             let next$1 = $1;
-            let new$1 = new$9.tail;
+            let new$1 = new$10.tail;
             let prev$1 = $;
             let old$1 = old.tail;
             let composed_mapper = compose_mapper(mapper, next$1.mapper);
@@ -3535,7 +3538,7 @@ function do_diff(loop$old, loop$old_keyed, loop$new, loop$new_keyed, loop$moved,
             loop$events = events$1;
           } else {
             let next$1 = $1;
-            let new_remaining = new$9.tail;
+            let new_remaining = new$10.tail;
             let prev$1 = $;
             let old_remaining = old.tail;
             let prev_count = advance(prev$1);
@@ -3576,11 +3579,11 @@ function do_diff(loop$old, loop$old_keyed, loop$new, loop$new_keyed, loop$moved,
     }
   }
 }
-function diff(events, old, new$9) {
+function diff(events, old, new$10) {
   return do_diff(
     toList([old]),
     empty2(),
-    toList([new$9]),
+    toList([new$10]),
     empty2(),
     empty_set(),
     0,
@@ -4712,9 +4715,9 @@ function on(name, handler) {
     0
   );
 }
-function on_change(msg) {
+function on_input(msg) {
   return on(
-    "change",
+    "input",
     subfield(
       toList(["target", "value"]),
       string2,
@@ -4725,7 +4728,19 @@ function on_change(msg) {
   );
 }
 
-// build/dev/javascript/cypher_char_sheet/character.mjs
+// build/dev/javascript/cypher_char_sheet/character/statpool.mjs
+var StatPool = class extends CustomType {
+  constructor(max2, current) {
+    super();
+    this.max = max2;
+    this.current = current;
+  }
+};
+function new$8() {
+  return new StatPool(0, 0);
+}
+
+// build/dev/javascript/cypher_char_sheet/character/core.mjs
 var Character = class extends CustomType {
   constructor(name, descriptor, type_2, focus, tier, effort, xp, might_pool, might_edge, speed_pool, speed_edge, intellect_pool, intellect_edge, skills, abilities, cypher_limit, cyphers) {
     super();
@@ -4748,27 +4763,80 @@ var Character = class extends CustomType {
     this.cyphers = cyphers;
   }
 };
-var StatPool = class extends CustomType {
-  constructor(max2, current) {
+var UpdateName = class extends CustomType {
+  constructor($0) {
     super();
-    this.max = max2;
-    this.current = current;
+    this[0] = $0;
   }
 };
-function new$8() {
+var UpdateType = class extends CustomType {
+  constructor($0) {
+    super();
+    this[0] = $0;
+  }
+};
+var UpdateDescriptor = class extends CustomType {
+  constructor($0) {
+    super();
+    this[0] = $0;
+  }
+};
+var UpdateFocus = class extends CustomType {
+  constructor($0) {
+    super();
+    this[0] = $0;
+  }
+};
+var UpdateCypherLimit = class extends CustomType {
+  constructor($0) {
+    super();
+    this[0] = $0;
+  }
+};
+var UpdateXP = class extends CustomType {
+  constructor($0) {
+    super();
+    this[0] = $0;
+  }
+};
+var UpdateTier = class extends CustomType {
+  constructor($0) {
+    super();
+    this[0] = $0;
+  }
+};
+var UpdateEffort = class extends CustomType {
+  constructor($0) {
+    super();
+    this[0] = $0;
+  }
+};
+var UpdateMightEdge = class extends CustomType {
+  constructor($0) {
+    super();
+    this[0] = $0;
+  }
+};
+var UpdateSpeedEdge = class extends CustomType {
+  constructor($0) {
+    super();
+    this[0] = $0;
+  }
+};
+function new$9() {
   return new Character(
-    "Steve",
+    "",
     "",
     "",
     "",
     1,
     1,
     0,
-    new StatPool(0, 0),
+    new$8(),
     0,
-    new StatPool(0, 0),
+    new$8(),
     0,
-    new StatPool(0, 0),
+    new$8(),
     0,
     toList([]),
     toList([]),
@@ -4776,57 +4844,295 @@ function new$8() {
     toList([])
   );
 }
+function handle_character_update(character, msg) {
+  if (msg instanceof UpdateName) {
+    let value2 = msg[0];
+    let _record = character;
+    return new Character(
+      value2,
+      _record.descriptor,
+      _record.type_,
+      _record.focus,
+      _record.tier,
+      _record.effort,
+      _record.xp,
+      _record.might_pool,
+      _record.might_edge,
+      _record.speed_pool,
+      _record.speed_edge,
+      _record.intellect_pool,
+      _record.intellect_edge,
+      _record.skills,
+      _record.abilities,
+      _record.cypher_limit,
+      _record.cyphers
+    );
+  } else if (msg instanceof UpdateType) {
+    let value2 = msg[0];
+    let _record = character;
+    return new Character(
+      _record.name,
+      _record.descriptor,
+      value2,
+      _record.focus,
+      _record.tier,
+      _record.effort,
+      _record.xp,
+      _record.might_pool,
+      _record.might_edge,
+      _record.speed_pool,
+      _record.speed_edge,
+      _record.intellect_pool,
+      _record.intellect_edge,
+      _record.skills,
+      _record.abilities,
+      _record.cypher_limit,
+      _record.cyphers
+    );
+  } else if (msg instanceof UpdateDescriptor) {
+    let value2 = msg[0];
+    let _record = character;
+    return new Character(
+      _record.name,
+      value2,
+      _record.type_,
+      _record.focus,
+      _record.tier,
+      _record.effort,
+      _record.xp,
+      _record.might_pool,
+      _record.might_edge,
+      _record.speed_pool,
+      _record.speed_edge,
+      _record.intellect_pool,
+      _record.intellect_edge,
+      _record.skills,
+      _record.abilities,
+      _record.cypher_limit,
+      _record.cyphers
+    );
+  } else if (msg instanceof UpdateFocus) {
+    let value2 = msg[0];
+    let _record = character;
+    return new Character(
+      _record.name,
+      _record.descriptor,
+      _record.type_,
+      value2,
+      _record.tier,
+      _record.effort,
+      _record.xp,
+      _record.might_pool,
+      _record.might_edge,
+      _record.speed_pool,
+      _record.speed_edge,
+      _record.intellect_pool,
+      _record.intellect_edge,
+      _record.skills,
+      _record.abilities,
+      _record.cypher_limit,
+      _record.cyphers
+    );
+  } else if (msg instanceof UpdateCypherLimit) {
+    let value2 = msg[0];
+    let _record = character;
+    return new Character(
+      _record.name,
+      _record.descriptor,
+      _record.type_,
+      _record.focus,
+      _record.tier,
+      _record.effort,
+      _record.xp,
+      _record.might_pool,
+      _record.might_edge,
+      _record.speed_pool,
+      _record.speed_edge,
+      _record.intellect_pool,
+      _record.intellect_edge,
+      _record.skills,
+      _record.abilities,
+      value2,
+      _record.cyphers
+    );
+  } else if (msg instanceof UpdateXP) {
+    let value2 = msg[0];
+    let _record = character;
+    return new Character(
+      _record.name,
+      _record.descriptor,
+      _record.type_,
+      _record.focus,
+      _record.tier,
+      _record.effort,
+      value2,
+      _record.might_pool,
+      _record.might_edge,
+      _record.speed_pool,
+      _record.speed_edge,
+      _record.intellect_pool,
+      _record.intellect_edge,
+      _record.skills,
+      _record.abilities,
+      _record.cypher_limit,
+      _record.cyphers
+    );
+  } else if (msg instanceof UpdateTier) {
+    let value2 = msg[0];
+    let _record = character;
+    return new Character(
+      _record.name,
+      _record.descriptor,
+      _record.type_,
+      _record.focus,
+      value2,
+      _record.effort,
+      _record.xp,
+      _record.might_pool,
+      _record.might_edge,
+      _record.speed_pool,
+      _record.speed_edge,
+      _record.intellect_pool,
+      _record.intellect_edge,
+      _record.skills,
+      _record.abilities,
+      _record.cypher_limit,
+      _record.cyphers
+    );
+  } else if (msg instanceof UpdateEffort) {
+    let value2 = msg[0];
+    let _record = character;
+    return new Character(
+      _record.name,
+      _record.descriptor,
+      _record.type_,
+      _record.focus,
+      _record.tier,
+      value2,
+      _record.xp,
+      _record.might_pool,
+      _record.might_edge,
+      _record.speed_pool,
+      _record.speed_edge,
+      _record.intellect_pool,
+      _record.intellect_edge,
+      _record.skills,
+      _record.abilities,
+      _record.cypher_limit,
+      _record.cyphers
+    );
+  } else if (msg instanceof UpdateMightEdge) {
+    let value2 = msg[0];
+    let _record = character;
+    return new Character(
+      _record.name,
+      _record.descriptor,
+      _record.type_,
+      _record.focus,
+      _record.tier,
+      _record.effort,
+      _record.xp,
+      _record.might_pool,
+      value2,
+      _record.speed_pool,
+      _record.speed_edge,
+      _record.intellect_pool,
+      _record.intellect_edge,
+      _record.skills,
+      _record.abilities,
+      _record.cypher_limit,
+      _record.cyphers
+    );
+  } else if (msg instanceof UpdateSpeedEdge) {
+    let value2 = msg[0];
+    let _record = character;
+    return new Character(
+      _record.name,
+      _record.descriptor,
+      _record.type_,
+      _record.focus,
+      _record.tier,
+      _record.effort,
+      _record.xp,
+      _record.might_pool,
+      _record.might_edge,
+      _record.speed_pool,
+      value2,
+      _record.intellect_pool,
+      _record.intellect_edge,
+      _record.skills,
+      _record.abilities,
+      _record.cypher_limit,
+      _record.cyphers
+    );
+  } else {
+    let value2 = msg[0];
+    let _record = character;
+    return new Character(
+      _record.name,
+      _record.descriptor,
+      _record.type_,
+      _record.focus,
+      _record.tier,
+      _record.effort,
+      _record.xp,
+      _record.might_pool,
+      _record.might_edge,
+      _record.speed_pool,
+      _record.speed_edge,
+      _record.intellect_pool,
+      value2,
+      _record.skills,
+      _record.abilities,
+      _record.cypher_limit,
+      _record.cyphers
+    );
+  }
+}
 
 // build/dev/javascript/cypher_char_sheet/cypher_char_sheet.mjs
 var FILEPATH = "src/cypher_char_sheet.gleam";
-var UserChangesName = class extends CustomType {
+var Model = class extends CustomType {
+  constructor(character) {
+    super();
+    this.character = character;
+  }
+};
+var UserUpdatesCharacter = class extends CustomType {
   constructor($0) {
     super();
     this[0] = $0;
   }
 };
 function init(_) {
-  return new$8();
+  return new Model(new$9());
 }
 function update2(model, msg) {
-  let value2 = msg[0];
-  let _record = model;
-  return new Character(
-    value2,
-    _record.descriptor,
-    _record.type_,
-    _record.focus,
-    _record.tier,
-    _record.effort,
-    _record.xp,
-    _record.might_pool,
-    _record.might_edge,
-    _record.speed_pool,
-    _record.speed_edge,
-    _record.intellect_pool,
-    _record.intellect_edge,
-    _record.skills,
-    _record.abilities,
-    _record.cypher_limit,
-    _record.cyphers
-  );
+  let update_msg = msg[0];
+  return new Model(handle_character_update(model.character, update_msg));
 }
-function view(model) {
+function view_character_core(model) {
   return div(
-    toList([]),
+    toList([class$("container-xl")]),
     toList([
       input(
         toList([
+          class$("m-4 border-black border rounded-sm"),
           type_("text"),
-          value(model.name),
-          on_change((value2) => {
-            return new UserChangesName(value2);
-          })
+          value(model.character.name),
+          on_input(
+            (value2) => {
+              return new UserUpdatesCharacter(new UpdateName(value2));
+            }
+          )
         ])
       ),
-      div(toList([]), toList([text3(model.name)]))
+      div(toList([]), toList([text3(model.character.name)]))
     ])
   );
+}
+function view(model) {
+  return view_character_core(model);
 }
 function main() {
   let app = simple(init, update2, view);
@@ -4839,7 +5145,7 @@ function main() {
       14,
       "main",
       "Pattern match failed, no pattern matched the value.",
-      { value: $, start: 376, end: 425, pattern_start: 387, pattern_end: 392 }
+      { value: $, start: 381, end: 430, pattern_start: 392, pattern_end: 397 }
     );
   }
   return void 0;

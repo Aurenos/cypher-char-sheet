@@ -1,2 +1,5 @@
+lustre +COMMAND:
+    gleam run -m lustre/dev {{COMMAND}}
+
 start:
-    gleam run -m lustre/dev start
+    just lustre start
