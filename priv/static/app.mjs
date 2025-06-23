@@ -2085,6 +2085,9 @@ function attribute2(name, value2) {
 function class$(name) {
   return attribute2("class", name);
 }
+function placeholder(text4) {
+  return attribute2("placeholder", text4);
+}
 function type_(control_type) {
   return attribute2("type", control_type);
 }
@@ -4775,7 +4778,7 @@ function on_input(msg) {
   );
 }
 
-// build/dev/javascript/cypher_char_sheet/character/statpool.mjs
+// build/dev/javascript/app/character/statpool.mjs
 var StatPool = class extends CustomType {
   constructor(max2, current) {
     super();
@@ -4787,7 +4790,7 @@ function new$8() {
   return new StatPool(0, 0);
 }
 
-// build/dev/javascript/cypher_char_sheet/character/character.mjs
+// build/dev/javascript/app/character/character.mjs
 var Character = class extends CustomType {
   constructor(name, descriptor, type_2, focus, tier, effort, xp, might_pool, might_edge, speed_pool, speed_edge, intellect_pool, intellect_edge, skills, abilities, cypher_limit, cyphers) {
     super();
@@ -5136,19 +5139,43 @@ function update2(character, msg) {
     );
   }
 }
+function basic_input(label, value2, on_input2) {
+  return input(
+    toList([
+      placeholder(label),
+      class$("m-4 border-black border rounded text-center"),
+      type_("text"),
+      value(value2),
+      on_input(on_input2)
+    ])
+  );
+}
 function view_character_basics(character) {
   return div(
     toList([]),
     toList([
-      input(
-        toList([
-          class$("m-4 border-black border rounded text-center"),
-          type_("text"),
-          value(character.name),
-          on_input((value2) => {
-            return new UpdateName(value2);
-          })
-        ])
+      basic_input(
+        "Name",
+        character.name,
+        (value2) => {
+          return new UpdateName(value2);
+        }
+      ),
+      text3("is a"),
+      basic_input(
+        "Descriptor",
+        character.descriptor,
+        (value2) => {
+          return new UpdateDescriptor(value2);
+        }
+      ),
+      text3("that"),
+      basic_input(
+        "Focus",
+        character.focus,
+        (value2) => {
+          return new UpdateName(value2);
+        }
       ),
       div(toList([]), toList([text3(character.name)]))
     ])
@@ -5158,8 +5185,8 @@ function view(character) {
   return view_character_basics(character);
 }
 
-// build/dev/javascript/cypher_char_sheet/cypher_char_sheet.mjs
-var FILEPATH = "src/cypher_char_sheet.gleam";
+// build/dev/javascript/app/app.mjs
+var FILEPATH = "src/app.gleam";
 var Model = class extends CustomType {
   constructor(character) {
     super();
@@ -5199,7 +5226,7 @@ function main() {
     throw makeError(
       "let_assert",
       FILEPATH,
-      "cypher_char_sheet",
+      "app",
       13,
       "main",
       "Pattern match failed, no pattern matched the value.",

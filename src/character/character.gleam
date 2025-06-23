@@ -88,12 +88,27 @@ pub fn view(character: Character) -> Element(Msg) {
 
 fn view_character_basics(character: Character) -> Element(Msg) {
   html.div([], [
-    html.input([
-      attribute.class("m-4 border-black border rounded text-center"),
-      attribute.type_("text"),
-      attribute.value(character.name),
-      event.on_input(fn(value) { UpdateName(value) }),
-    ]),
+    basic_input("Name", character.name, fn(value) { UpdateName(value) }),
+    html.text("is a"),
+    basic_input("Descriptor", character.descriptor, fn(value) {
+      UpdateDescriptor(value)
+    }),
+    html.text("that"),
+    basic_input("Focus", character.focus, fn(value) { UpdateName(value) }),
     html.div([], [html.text(character.name)]),
+  ])
+}
+
+fn basic_input(
+  label: String,
+  value: String,
+  on_input: fn(String) -> Msg,
+) -> Element(Msg) {
+  html.input([
+    attribute.placeholder(label),
+    attribute.class("m-4 border-black border rounded text-center"),
+    attribute.type_("text"),
+    attribute.value(value),
+    event.on_input(on_input),
   ])
 }
