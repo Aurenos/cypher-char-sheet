@@ -2,6 +2,8 @@ import character/ability.{type Ability}
 import character/cypher.{type Cypher}
 import character/skill.{type Skill}
 import character/statpool.{type StatPool}
+import gleam/int
+import gleam/result
 import lustre/attribute
 import lustre/element.{type Element}
 import lustre/element/html
@@ -94,7 +96,10 @@ fn view_character_basics(character: Character) -> Element(Msg) {
       UpdateDescriptor(value)
     }),
     html.text("that"),
-    basic_input("Focus", character.focus, fn(value) { UpdateName(value) }),
+    basic_input("Focus", character.focus, fn(value) { UpdateFocus(value) }),
+    integer_input("Tier", character.tier, fn(value) { UpdateTier(value) }),
+    integer_input("XP", character.xp, fn(value) { UpdateXP(value) }),
+    integer_input("Effort", character.effort, fn(value) { UpdateEffort(value) }),
     html.div([], [html.text(character.name)]),
   ])
 }
@@ -110,5 +115,17 @@ fn basic_input(
     attribute.type_("text"),
     attribute.value(value),
     event.on_input(on_input),
+  ])
+}
+
+fn integer_input(label: String, value: Int, update_fn: fn(Int) -> Msg) {
+  html.input([
+    attribute.placeholder(label),
+    attribute.class("m-4 border-black border rounded text-center"),
+    attribute.type_("number"),
+    attribute.value(int.to_string(value)),
+    event.on_input(fn(new_value) {
+      new_value |> int.parse() |> result.unwrap(value) |> update_fn
+    }),
   ])
 }

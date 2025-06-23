@@ -1722,6 +1722,13 @@ var NOT_FOUND = {};
 function identity(x) {
   return x;
 }
+function parse_int(value2) {
+  if (/^[-+]?(\d+)$/.test(value2)) {
+    return new Ok(parseInt(value2));
+  } else {
+    return new Error(Nil);
+  }
+}
 function to_string(term) {
   return term.toString();
 }
@@ -1849,6 +1856,14 @@ function is_ok(result) {
     return true;
   } else {
     return false;
+  }
+}
+function unwrap(result, default$) {
+  if (result instanceof Ok) {
+    let v = result[0];
+    return v;
+  } else {
+    return default$;
   }
 }
 
@@ -5150,6 +5165,24 @@ function basic_input(label, value2, on_input2) {
     ])
   );
 }
+function integer_input(label, value2, update_fn) {
+  return input(
+    toList([
+      placeholder(label),
+      class$("m-4 border-black border rounded text-center"),
+      type_("number"),
+      value(to_string(value2)),
+      on_input(
+        (new_value) => {
+          let _pipe = new_value;
+          let _pipe$1 = parse_int(_pipe);
+          let _pipe$2 = unwrap(_pipe$1, value2);
+          return update_fn(_pipe$2);
+        }
+      )
+    ])
+  );
+}
 function view_character_basics(character) {
   return div(
     toList([]),
@@ -5174,7 +5207,28 @@ function view_character_basics(character) {
         "Focus",
         character.focus,
         (value2) => {
-          return new UpdateName(value2);
+          return new UpdateFocus(value2);
+        }
+      ),
+      integer_input(
+        "Tier",
+        character.tier,
+        (value2) => {
+          return new UpdateTier(value2);
+        }
+      ),
+      integer_input(
+        "XP",
+        character.xp,
+        (value2) => {
+          return new UpdateXP(value2);
+        }
+      ),
+      integer_input(
+        "Effort",
+        character.effort,
+        (value2) => {
+          return new UpdateEffort(value2);
         }
       ),
       div(toList([]), toList([text3(character.name)]))
