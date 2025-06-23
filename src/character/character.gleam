@@ -66,6 +66,12 @@ pub type Msg {
   UpdateMightEdge(Int)
   UpdateSpeedEdge(Int)
   UpdateIntellectEdge(Int)
+  UpdateMightPoolCurrent(Int)
+  UpdateMightPoolMax(Int)
+  UpdateSpeedPoolCurrent(Int)
+  UpdateSpeedPoolMax(Int)
+  UpdateIntellectPoolCurrent(Int)
+  UpdateIntellectPoolMax(Int)
 }
 
 pub fn update(character: Character, msg: Msg) -> Character {
@@ -81,6 +87,36 @@ pub fn update(character: Character, msg: Msg) -> Character {
     UpdateMightEdge(value) -> Character(..character, might_edge: value)
     UpdateSpeedEdge(value) -> Character(..character, speed_edge: value)
     UpdateIntellectEdge(value) -> Character(..character, intellect_edge: value)
+    UpdateMightPoolCurrent(value) ->
+      Character(
+        ..character,
+        might_pool: statpool.update_current(character.might_pool, value),
+      )
+    UpdateMightPoolMax(value) ->
+      Character(
+        ..character,
+        might_pool: statpool.update_max(character.might_pool, value),
+      )
+    UpdateSpeedPoolCurrent(value) ->
+      Character(
+        ..character,
+        speed_pool: statpool.update_current(character.speed_pool, value),
+      )
+    UpdateSpeedPoolMax(value) ->
+      Character(
+        ..character,
+        speed_pool: statpool.update_max(character.speed_pool, value),
+      )
+    UpdateIntellectPoolCurrent(value) ->
+      Character(
+        ..character,
+        intellect_pool: statpool.update_current(character.intellect_pool, value),
+      )
+    UpdateIntellectPoolMax(value) ->
+      Character(
+        ..character,
+        intellect_pool: statpool.update_max(character.intellect_pool, value),
+      )
   }
 }
 
@@ -107,14 +143,14 @@ fn view_character_basics(character: Character) -> Element(Msg) {
 fn basic_input(
   label: String,
   value: String,
-  on_input: fn(String) -> Msg,
+  update_fn: fn(String) -> Msg,
 ) -> Element(Msg) {
   html.input([
     attribute.placeholder(label),
     attribute.class("m-4 border-black border rounded text-center"),
     attribute.type_("text"),
     attribute.value(value),
-    event.on_input(on_input),
+    event.on_input(update_fn),
   ])
 }
 

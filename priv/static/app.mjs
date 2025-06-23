@@ -1087,6 +1087,29 @@ var Eq = class extends CustomType {
 var Gt = class extends CustomType {
 };
 
+// build/dev/javascript/gleam_stdlib/gleam/int.mjs
+function min(a, b) {
+  let $ = a < b;
+  if ($) {
+    return a;
+  } else {
+    return b;
+  }
+}
+function max(a, b) {
+  let $ = a > b;
+  if ($) {
+    return a;
+  } else {
+    return b;
+  }
+}
+function clamp(x, min_bound, max_bound) {
+  let _pipe = x;
+  let _pipe$1 = min(_pipe, max_bound);
+  return max(_pipe$1, min_bound);
+}
+
 // build/dev/javascript/gleam_stdlib/gleam/list.mjs
 var Ascending = class extends CustomType {
 };
@@ -4804,6 +4827,14 @@ var StatPool = class extends CustomType {
 function new$8() {
   return new StatPool(0, 0);
 }
+function update_current(pool, value2) {
+  let _record = pool;
+  return new StatPool(_record.max, clamp(value2, 0, pool.max));
+}
+function update_max(pool, value2) {
+  let _record = pool;
+  return new StatPool(max(value2, 0), _record.current);
+}
 
 // build/dev/javascript/app/character/character.mjs
 var Character = class extends CustomType {
@@ -4883,6 +4914,42 @@ var UpdateMightEdge = class extends CustomType {
   }
 };
 var UpdateSpeedEdge = class extends CustomType {
+  constructor($0) {
+    super();
+    this[0] = $0;
+  }
+};
+var UpdateIntellectEdge = class extends CustomType {
+  constructor($0) {
+    super();
+    this[0] = $0;
+  }
+};
+var UpdateMightPoolCurrent = class extends CustomType {
+  constructor($0) {
+    super();
+    this[0] = $0;
+  }
+};
+var UpdateMightPoolMax = class extends CustomType {
+  constructor($0) {
+    super();
+    this[0] = $0;
+  }
+};
+var UpdateSpeedPoolCurrent = class extends CustomType {
+  constructor($0) {
+    super();
+    this[0] = $0;
+  }
+};
+var UpdateSpeedPoolMax = class extends CustomType {
+  constructor($0) {
+    super();
+    this[0] = $0;
+  }
+};
+var UpdateIntellectPoolCurrent = class extends CustomType {
   constructor($0) {
     super();
     this[0] = $0;
@@ -5130,7 +5197,7 @@ function update2(character, msg) {
       _record.cypher_limit,
       _record.cyphers
     );
-  } else {
+  } else if (msg instanceof UpdateIntellectEdge) {
     let value2 = msg[0];
     let _record = character;
     return new Character(
@@ -5152,16 +5219,148 @@ function update2(character, msg) {
       _record.cypher_limit,
       _record.cyphers
     );
+  } else if (msg instanceof UpdateMightPoolCurrent) {
+    let value2 = msg[0];
+    let _record = character;
+    return new Character(
+      _record.name,
+      _record.descriptor,
+      _record.type_,
+      _record.focus,
+      _record.tier,
+      _record.effort,
+      _record.xp,
+      update_current(character.might_pool, value2),
+      _record.might_edge,
+      _record.speed_pool,
+      _record.speed_edge,
+      _record.intellect_pool,
+      _record.intellect_edge,
+      _record.skills,
+      _record.abilities,
+      _record.cypher_limit,
+      _record.cyphers
+    );
+  } else if (msg instanceof UpdateMightPoolMax) {
+    let value2 = msg[0];
+    let _record = character;
+    return new Character(
+      _record.name,
+      _record.descriptor,
+      _record.type_,
+      _record.focus,
+      _record.tier,
+      _record.effort,
+      _record.xp,
+      update_max(character.might_pool, value2),
+      _record.might_edge,
+      _record.speed_pool,
+      _record.speed_edge,
+      _record.intellect_pool,
+      _record.intellect_edge,
+      _record.skills,
+      _record.abilities,
+      _record.cypher_limit,
+      _record.cyphers
+    );
+  } else if (msg instanceof UpdateSpeedPoolCurrent) {
+    let value2 = msg[0];
+    let _record = character;
+    return new Character(
+      _record.name,
+      _record.descriptor,
+      _record.type_,
+      _record.focus,
+      _record.tier,
+      _record.effort,
+      _record.xp,
+      _record.might_pool,
+      _record.might_edge,
+      update_current(character.speed_pool, value2),
+      _record.speed_edge,
+      _record.intellect_pool,
+      _record.intellect_edge,
+      _record.skills,
+      _record.abilities,
+      _record.cypher_limit,
+      _record.cyphers
+    );
+  } else if (msg instanceof UpdateSpeedPoolMax) {
+    let value2 = msg[0];
+    let _record = character;
+    return new Character(
+      _record.name,
+      _record.descriptor,
+      _record.type_,
+      _record.focus,
+      _record.tier,
+      _record.effort,
+      _record.xp,
+      _record.might_pool,
+      _record.might_edge,
+      update_max(character.speed_pool, value2),
+      _record.speed_edge,
+      _record.intellect_pool,
+      _record.intellect_edge,
+      _record.skills,
+      _record.abilities,
+      _record.cypher_limit,
+      _record.cyphers
+    );
+  } else if (msg instanceof UpdateIntellectPoolCurrent) {
+    let value2 = msg[0];
+    let _record = character;
+    return new Character(
+      _record.name,
+      _record.descriptor,
+      _record.type_,
+      _record.focus,
+      _record.tier,
+      _record.effort,
+      _record.xp,
+      _record.might_pool,
+      _record.might_edge,
+      _record.speed_pool,
+      _record.speed_edge,
+      update_current(character.intellect_pool, value2),
+      _record.intellect_edge,
+      _record.skills,
+      _record.abilities,
+      _record.cypher_limit,
+      _record.cyphers
+    );
+  } else {
+    let value2 = msg[0];
+    let _record = character;
+    return new Character(
+      _record.name,
+      _record.descriptor,
+      _record.type_,
+      _record.focus,
+      _record.tier,
+      _record.effort,
+      _record.xp,
+      _record.might_pool,
+      _record.might_edge,
+      _record.speed_pool,
+      _record.speed_edge,
+      update_max(character.intellect_pool, value2),
+      _record.intellect_edge,
+      _record.skills,
+      _record.abilities,
+      _record.cypher_limit,
+      _record.cyphers
+    );
   }
 }
-function basic_input(label, value2, on_input2) {
+function basic_input(label, value2, update_fn) {
   return input(
     toList([
       placeholder(label),
       class$("m-4 border-black border rounded text-center"),
       type_("text"),
       value(value2),
-      on_input(on_input2)
+      on_input(update_fn)
     ])
   );
 }
