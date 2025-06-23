@@ -2,6 +2,10 @@ import character/ability.{type Ability}
 import character/cypher.{type Cypher}
 import character/skill.{type Skill}
 import character/statpool.{type StatPool}
+import lustre/attribute
+import lustre/element.{type Element}
+import lustre/element/html
+import lustre/event
 
 pub type Character {
   Character(
@@ -48,7 +52,7 @@ pub fn new() -> Character {
   )
 }
 
-pub type CharacterUpdateMsg {
+pub type Msg {
   UpdateName(String)
   UpdateType(String)
   UpdateDescriptor(String)
@@ -62,10 +66,7 @@ pub type CharacterUpdateMsg {
   UpdateIntellectEdge(Int)
 }
 
-pub fn handle_character_update(
-  character: Character,
-  msg: CharacterUpdateMsg,
-) -> Character {
+pub fn update(character: Character, msg: Msg) -> Character {
   case msg {
     UpdateName(value) -> Character(..character, name: value)
     UpdateType(value) -> Character(..character, type_: value)
@@ -79,4 +80,20 @@ pub fn handle_character_update(
     UpdateSpeedEdge(value) -> Character(..character, speed_edge: value)
     UpdateIntellectEdge(value) -> Character(..character, intellect_edge: value)
   }
+}
+
+pub fn view(character: Character) -> Element(Msg) {
+  view_character_basics(character)
+}
+
+fn view_character_basics(character: Character) -> Element(Msg) {
+  html.div([], [
+    html.input([
+      attribute.class("m-4 border-black border rounded text-center"),
+      attribute.type_("text"),
+      attribute.value(character.name),
+      event.on_input(fn(value) { UpdateName(value) }),
+    ]),
+    html.div([], [html.text(character.name)]),
+  ])
 }
