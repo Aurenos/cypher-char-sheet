@@ -317,11 +317,11 @@ function isEqual(x, y) {
   }
   return true;
 }
-function getters(object3) {
-  if (object3 instanceof Map) {
+function getters(object4) {
+  if (object4 instanceof Map) {
     return [(x) => x.keys(), (x, y) => x.get(y)];
   } else {
-    let extra = object3 instanceof globalThis.Error ? ["message"] : [];
+    let extra = object4 instanceof globalThis.Error ? ["message"] : [];
     return [(x) => [...extra, ...Object.keys(x)], (x, y) => x[y]];
   }
 }
@@ -1859,20 +1859,6 @@ function insert(dict2, key, value2) {
   return map_insert(key, value2, dict2);
 }
 
-// build/dev/javascript/gleam_stdlib/gleam/bool.mjs
-function guard(requirement, consequence, alternative) {
-  if (requirement) {
-    return consequence;
-  } else {
-    return alternative();
-  }
-}
-
-// build/dev/javascript/gleam_stdlib/gleam/function.mjs
-function identity2(x) {
-  return x;
-}
-
 // build/dev/javascript/gleam_stdlib/gleam/result.mjs
 function is_ok(result) {
   if (result instanceof Ok) {
@@ -1888,6 +1874,20 @@ function unwrap(result, default$) {
   } else {
     return default$;
   }
+}
+
+// build/dev/javascript/gleam_stdlib/gleam/bool.mjs
+function guard(requirement, consequence, alternative) {
+  if (requirement) {
+    return consequence;
+  } else {
+    return alternative();
+  }
+}
+
+// build/dev/javascript/gleam_stdlib/gleam/function.mjs
+function identity2(x) {
+  return x;
 }
 
 // build/dev/javascript/gleam_stdlib/gleam/set.mjs
@@ -1969,6 +1969,20 @@ var Event2 = class extends CustomType {
     this.immediate = immediate2;
     this.debounce = debounce;
     this.throttle = throttle;
+  }
+};
+var Handler = class extends CustomType {
+  constructor(prevent_default, stop_propagation, message) {
+    super();
+    this.prevent_default = prevent_default;
+    this.stop_propagation = stop_propagation;
+    this.message = message;
+  }
+};
+var Never = class extends CustomType {
+  constructor(kind) {
+    super();
+    this.kind = kind;
   }
 };
 function merge(loop$attributes, loop$merged) {
@@ -2115,6 +2129,9 @@ function event(name, handler, include, prevent_default, stop_propagation, immedi
     throttle
   );
 }
+var never_kind = 0;
+var never = /* @__PURE__ */ new Never(never_kind);
+var always_kind = 2;
 
 // build/dev/javascript/lustre/lustre/attribute.mjs
 function attribute2(name, value2) {
@@ -2217,8 +2234,7 @@ function add2(parent, index4, key) {
   }
 }
 var root2 = /* @__PURE__ */ new Root();
-var separator_index = "\n";
-var separator_key = "	";
+var separator_element = "	";
 function do_to_string(loop$path, loop$acc) {
   while (true) {
     let path = loop$path;
@@ -2234,13 +2250,13 @@ function do_to_string(loop$path, loop$acc) {
       let key = path.key;
       let parent = path.parent;
       loop$path = parent;
-      loop$acc = prepend(separator_key, prepend(key, acc));
+      loop$acc = prepend(separator_element, prepend(key, acc));
     } else {
       let index4 = path.index;
       let parent = path.parent;
       loop$path = parent;
       loop$acc = prepend(
-        separator_index,
+        separator_element,
         prepend(to_string(index4), acc)
       );
     }
@@ -2256,7 +2272,7 @@ function matches(path, candidates) {
     return do_matches(to_string2(path), candidates);
   }
 }
-var separator_event = "\f";
+var separator_event = "\n";
 function event2(path, event4) {
   return do_to_string(path, toList([separator_event, event4]));
 }
@@ -2543,6 +2559,427 @@ function to_keyed(key, node) {
   }
 }
 
+// build/dev/javascript/lustre/lustre/internals/equals.ffi.mjs
+var isReferenceEqual = (a, b) => a === b;
+var isEqual2 = (a, b) => {
+  if (a === b) {
+    return true;
+  }
+  if (a == null || b == null) {
+    return false;
+  }
+  const type = typeof a;
+  if (type !== typeof b) {
+    return false;
+  }
+  if (type !== "object") {
+    return false;
+  }
+  const ctor = a.constructor;
+  if (ctor !== b.constructor) {
+    return false;
+  }
+  if (Array.isArray(a)) {
+    return areArraysEqual(a, b);
+  }
+  return areObjectsEqual(a, b);
+};
+var areArraysEqual = (a, b) => {
+  let index4 = a.length;
+  if (index4 !== b.length) {
+    return false;
+  }
+  while (index4--) {
+    if (!isEqual2(a[index4], b[index4])) {
+      return false;
+    }
+  }
+  return true;
+};
+var areObjectsEqual = (a, b) => {
+  const properties = Object.keys(a);
+  let index4 = properties.length;
+  if (Object.keys(b).length !== index4) {
+    return false;
+  }
+  while (index4--) {
+    const property3 = properties[index4];
+    if (!Object.hasOwn(b, property3)) {
+      return false;
+    }
+    if (!isEqual2(a[property3], b[property3])) {
+      return false;
+    }
+  }
+  return true;
+};
+
+// build/dev/javascript/lustre/lustre/vdom/events.mjs
+var Events = class extends CustomType {
+  constructor(handlers, dispatched_paths, next_dispatched_paths) {
+    super();
+    this.handlers = handlers;
+    this.dispatched_paths = dispatched_paths;
+    this.next_dispatched_paths = next_dispatched_paths;
+  }
+};
+function new$3() {
+  return new Events(
+    empty2(),
+    empty_list,
+    empty_list
+  );
+}
+function tick(events) {
+  return new Events(
+    events.handlers,
+    events.next_dispatched_paths,
+    empty_list
+  );
+}
+function do_remove_event(handlers, path, name) {
+  return remove(handlers, event2(path, name));
+}
+function remove_event(events, path, name) {
+  let handlers = do_remove_event(events.handlers, path, name);
+  let _record = events;
+  return new Events(
+    handlers,
+    _record.dispatched_paths,
+    _record.next_dispatched_paths
+  );
+}
+function remove_attributes(handlers, path, attributes) {
+  return fold(
+    attributes,
+    handlers,
+    (events, attribute3) => {
+      if (attribute3 instanceof Event2) {
+        let name = attribute3.name;
+        return do_remove_event(events, path, name);
+      } else {
+        return events;
+      }
+    }
+  );
+}
+function handle(events, path, name, event4) {
+  let next_dispatched_paths = prepend(path, events.next_dispatched_paths);
+  let _block;
+  let _record = events;
+  _block = new Events(
+    _record.handlers,
+    _record.dispatched_paths,
+    next_dispatched_paths
+  );
+  let events$1 = _block;
+  let $ = get(
+    events$1.handlers,
+    path + separator_event + name
+  );
+  if ($ instanceof Ok) {
+    let handler = $[0];
+    return [events$1, run(event4, handler)];
+  } else {
+    return [events$1, new Error(toList([]))];
+  }
+}
+function has_dispatched_events(events, path) {
+  return matches(path, events.dispatched_paths);
+}
+function do_add_event(handlers, mapper, path, name, handler) {
+  return insert3(
+    handlers,
+    event2(path, name),
+    map2(
+      handler,
+      (handler2) => {
+        let _record = handler2;
+        return new Handler(
+          _record.prevent_default,
+          _record.stop_propagation,
+          identity2(mapper)(handler2.message)
+        );
+      }
+    )
+  );
+}
+function add_event(events, mapper, path, name, handler) {
+  let handlers = do_add_event(events.handlers, mapper, path, name, handler);
+  let _record = events;
+  return new Events(
+    handlers,
+    _record.dispatched_paths,
+    _record.next_dispatched_paths
+  );
+}
+function add_attributes(handlers, mapper, path, attributes) {
+  return fold(
+    attributes,
+    handlers,
+    (events, attribute3) => {
+      if (attribute3 instanceof Event2) {
+        let name = attribute3.name;
+        let handler = attribute3.handler;
+        return do_add_event(events, mapper, path, name, handler);
+      } else {
+        return events;
+      }
+    }
+  );
+}
+function compose_mapper(mapper, child_mapper) {
+  let $ = isReferenceEqual(mapper, identity2);
+  let $1 = isReferenceEqual(child_mapper, identity2);
+  if ($1) {
+    return mapper;
+  } else if ($) {
+    return child_mapper;
+  } else {
+    return (msg) => {
+      return mapper(child_mapper(msg));
+    };
+  }
+}
+function do_remove_children(loop$handlers, loop$path, loop$child_index, loop$children) {
+  while (true) {
+    let handlers = loop$handlers;
+    let path = loop$path;
+    let child_index = loop$child_index;
+    let children = loop$children;
+    if (children instanceof Empty) {
+      return handlers;
+    } else {
+      let child = children.head;
+      let rest = children.tail;
+      let _pipe = handlers;
+      let _pipe$1 = do_remove_child(_pipe, path, child_index, child);
+      loop$handlers = _pipe$1;
+      loop$path = path;
+      loop$child_index = child_index + advance(child);
+      loop$children = rest;
+    }
+  }
+}
+function do_remove_child(handlers, parent, child_index, child) {
+  if (child instanceof Fragment) {
+    let children = child.children;
+    return do_remove_children(handlers, parent, child_index + 1, children);
+  } else if (child instanceof Element) {
+    let attributes = child.attributes;
+    let children = child.children;
+    let path = add2(parent, child_index, child.key);
+    let _pipe = handlers;
+    let _pipe$1 = remove_attributes(_pipe, path, attributes);
+    return do_remove_children(_pipe$1, path, 0, children);
+  } else if (child instanceof Text) {
+    return handlers;
+  } else {
+    let attributes = child.attributes;
+    let path = add2(parent, child_index, child.key);
+    return remove_attributes(handlers, path, attributes);
+  }
+}
+function remove_child(events, parent, child_index, child) {
+  let handlers = do_remove_child(events.handlers, parent, child_index, child);
+  let _record = events;
+  return new Events(
+    handlers,
+    _record.dispatched_paths,
+    _record.next_dispatched_paths
+  );
+}
+function do_add_children(loop$handlers, loop$mapper, loop$path, loop$child_index, loop$children) {
+  while (true) {
+    let handlers = loop$handlers;
+    let mapper = loop$mapper;
+    let path = loop$path;
+    let child_index = loop$child_index;
+    let children = loop$children;
+    if (children instanceof Empty) {
+      return handlers;
+    } else {
+      let child = children.head;
+      let rest = children.tail;
+      let _pipe = handlers;
+      let _pipe$1 = do_add_child(_pipe, mapper, path, child_index, child);
+      loop$handlers = _pipe$1;
+      loop$mapper = mapper;
+      loop$path = path;
+      loop$child_index = child_index + advance(child);
+      loop$children = rest;
+    }
+  }
+}
+function do_add_child(handlers, mapper, parent, child_index, child) {
+  if (child instanceof Fragment) {
+    let children = child.children;
+    let composed_mapper = compose_mapper(mapper, child.mapper);
+    let child_index$1 = child_index + 1;
+    return do_add_children(
+      handlers,
+      composed_mapper,
+      parent,
+      child_index$1,
+      children
+    );
+  } else if (child instanceof Element) {
+    let attributes = child.attributes;
+    let children = child.children;
+    let path = add2(parent, child_index, child.key);
+    let composed_mapper = compose_mapper(mapper, child.mapper);
+    let _pipe = handlers;
+    let _pipe$1 = add_attributes(_pipe, composed_mapper, path, attributes);
+    return do_add_children(_pipe$1, composed_mapper, path, 0, children);
+  } else if (child instanceof Text) {
+    return handlers;
+  } else {
+    let attributes = child.attributes;
+    let path = add2(parent, child_index, child.key);
+    let composed_mapper = compose_mapper(mapper, child.mapper);
+    return add_attributes(handlers, composed_mapper, path, attributes);
+  }
+}
+function add_child(events, mapper, parent, index4, child) {
+  let handlers = do_add_child(events.handlers, mapper, parent, index4, child);
+  let _record = events;
+  return new Events(
+    handlers,
+    _record.dispatched_paths,
+    _record.next_dispatched_paths
+  );
+}
+function add_children(events, mapper, path, child_index, children) {
+  let handlers = do_add_children(
+    events.handlers,
+    mapper,
+    path,
+    child_index,
+    children
+  );
+  let _record = events;
+  return new Events(
+    handlers,
+    _record.dispatched_paths,
+    _record.next_dispatched_paths
+  );
+}
+
+// build/dev/javascript/lustre/lustre/element.mjs
+function element2(tag, attributes, children) {
+  return element(
+    "",
+    identity2,
+    "",
+    tag,
+    attributes,
+    children,
+    empty2(),
+    false,
+    false
+  );
+}
+function namespaced(namespace, tag, attributes, children) {
+  return element(
+    "",
+    identity2,
+    namespace,
+    tag,
+    attributes,
+    children,
+    empty2(),
+    false,
+    false
+  );
+}
+function text2(content) {
+  return text("", identity2, content);
+}
+function none2() {
+  return text("", identity2, "");
+}
+function count_fragment_children(loop$children, loop$count) {
+  while (true) {
+    let children = loop$children;
+    let count = loop$count;
+    if (children instanceof Empty) {
+      return count;
+    } else {
+      let child = children.head;
+      let rest = children.tail;
+      loop$children = rest;
+      loop$count = count + advance(child);
+    }
+  }
+}
+function fragment2(children) {
+  return fragment(
+    "",
+    identity2,
+    children,
+    empty2(),
+    count_fragment_children(children, 0)
+  );
+}
+function map3(element3, f) {
+  let mapper = identity2(compose_mapper(identity2(f), element3.mapper));
+  if (element3 instanceof Fragment) {
+    let children = element3.children;
+    let keyed_children = element3.keyed_children;
+    let _record = element3;
+    return new Fragment(
+      _record.kind,
+      _record.key,
+      mapper,
+      identity2(children),
+      identity2(keyed_children),
+      _record.children_count
+    );
+  } else if (element3 instanceof Element) {
+    let attributes = element3.attributes;
+    let children = element3.children;
+    let keyed_children = element3.keyed_children;
+    let _record = element3;
+    return new Element(
+      _record.kind,
+      _record.key,
+      mapper,
+      _record.namespace,
+      _record.tag,
+      identity2(attributes),
+      identity2(children),
+      identity2(keyed_children),
+      _record.self_closing,
+      _record.void
+    );
+  } else if (element3 instanceof Text) {
+    return identity2(element3);
+  } else {
+    let attributes = element3.attributes;
+    let _record = element3;
+    return new UnsafeInnerHtml(
+      _record.kind,
+      _record.key,
+      mapper,
+      _record.namespace,
+      _record.tag,
+      identity2(attributes),
+      _record.inner_html
+    );
+  }
+}
+
+// build/dev/javascript/lustre/lustre/element/html.mjs
+function text3(content) {
+  return text2(content);
+}
+function div(attrs, children) {
+  return element2("div", attrs, children);
+}
+function input(attrs) {
+  return element2("input", attrs, empty_list);
+}
+
 // build/dev/javascript/lustre/lustre/vdom/patch.mjs
 var Patch = class extends CustomType {
   constructor(index4, removed, changes, children) {
@@ -2617,7 +3054,7 @@ var Remove = class extends CustomType {
     this.count = count;
   }
 };
-function new$4(index4, removed, changes, children) {
+function new$5(index4, removed, changes, children) {
   return new Patch(index4, removed, changes, children);
 }
 var replace_text_kind = 0;
@@ -2859,13 +3296,22 @@ function diff_attributes(loop$controlled, loop$path, loop$mapper, loop$events, l
             } else if ($1 === "scrollRight") {
               _block = true;
             } else if ($1 === "value") {
-              _block = controlled || !isEqual(prev.value, next.value);
+              _block = controlled || !isEqual2(
+                prev.value,
+                next.value
+              );
             } else if ($1 === "checked") {
-              _block = controlled || !isEqual(prev.value, next.value);
+              _block = controlled || !isEqual2(
+                prev.value,
+                next.value
+              );
             } else if ($1 === "selected") {
-              _block = controlled || !isEqual(prev.value, next.value);
+              _block = controlled || !isEqual2(
+                prev.value,
+                next.value
+              );
             } else {
-              _block = !isEqual(prev.value, next.value);
+              _block = !isEqual2(prev.value, next.value);
             }
             let has_changes = _block;
             let _block$1;
@@ -2911,7 +3357,10 @@ function diff_attributes(loop$controlled, loop$path, loop$mapper, loop$events, l
         } else if (prev instanceof Event2) {
           let name = next.name;
           let handler = next.handler;
-          let has_changes = prev.prevent_default !== next.prevent_default || prev.stop_propagation !== next.stop_propagation || prev.immediate !== next.immediate || prev.debounce !== next.debounce || prev.throttle !== next.throttle;
+          let has_changes = !isEqual(
+            prev.prevent_default,
+            next.prevent_default
+          ) || !isEqual(prev.stop_propagation, next.stop_propagation) || prev.immediate !== next.immediate || prev.debounce !== next.debounce || prev.throttle !== next.throttle;
           let _block;
           if (has_changes) {
             _block = prepend(next, added);
@@ -3450,7 +3899,7 @@ function do_diff(loop$old, loop$old_keyed, loop$new, loop$new_keyed, loop$moved,
               let next$2 = $1;
               let new$1 = new$10.tail;
               let old$1 = old.tail;
-              let child = new$4(
+              let child = new$5(
                 node_index,
                 0,
                 toList([replace_text(next$2.content)]),
@@ -3558,7 +4007,7 @@ function do_diff(loop$old, loop$old_keyed, loop$new, loop$new_keyed, loop$moved,
               _block$2 = children;
             } else {
               _block$2 = prepend(
-                new$4(node_index, 0, child_changes$1, toList([])),
+                new$5(node_index, 0, child_changes$1, toList([])),
                 children
               );
             }
@@ -3647,17 +4096,14 @@ var Reconciler = class {
   };
   #useServerEvents = false;
   #exposeKeys = false;
-  constructor(root3, dispatch, {
-    useServerEvents = false,
-    exposeKeys = false
-  } = {}) {
+  constructor(root3, dispatch, { useServerEvents = false, exposeKeys = false } = {}) {
     this.#root = root3;
     this.#dispatch = dispatch;
     this.#useServerEvents = useServerEvents;
     this.#exposeKeys = exposeKeys;
   }
   mount(vdom) {
-    appendChild(this.#root, this.#createChild(this.#root, vdom));
+    appendChild(this.#root, this.#createChild(this.#root, 0, vdom));
   }
   #stack = [];
   push(patch) {
@@ -3736,9 +4182,11 @@ var Reconciler = class {
   // CHANGES -------------------------------------------------------------------
   #insert(node, children, before) {
     const fragment3 = createDocumentFragment();
+    let childIndex = before | 0;
     iterate(children, (child) => {
-      const el = this.#createChild(node, child);
+      const el = this.#createChild(node, childIndex, child);
       appendChild(fragment3, el);
+      childIndex += advance(child);
     });
     insertBefore(node, fragment3, childAt(node, before));
   }
@@ -3777,7 +4225,7 @@ var Reconciler = class {
   }
   #replace(parent, from, count, child) {
     this.#remove(parent, from, count);
-    const el = this.#createChild(parent, child);
+    const el = this.#createChild(parent, from, child);
     insertBefore(parent, el, childAt(parent, from));
   }
   #replaceText(node, content) {
@@ -3809,28 +4257,30 @@ var Reconciler = class {
     });
   }
   // CONSTRUCTORS --------------------------------------------------------------
-  #createChild(parent, vnode) {
+  #createChild(parent, index4, vnode) {
     switch (vnode.kind) {
       case element_kind: {
-        const node = createChildElement(parent, vnode);
+        const node = createChildElement(parent, index4, vnode);
         this.#createAttributes(node, vnode);
-        this.#insert(node, vnode.children, 0);
+        this.#insert(node, vnode.children);
         return node;
       }
       case text_kind: {
-        return createChildText(parent, vnode);
+        return createChildText(parent, index4, vnode);
       }
       case fragment_kind: {
         const node = createDocumentFragment();
-        const head = createChildText(parent, vnode);
+        const head = createChildText(parent, index4, vnode);
         appendChild(node, head);
+        let childIndex = index4 + 1;
         iterate(vnode.children, (child) => {
-          appendChild(node, this.#createChild(parent, child));
+          appendChild(node, this.#createChild(parent, childIndex, child));
+          childIndex += advance(child);
         });
         return node;
       }
       case unsafe_inner_html_kind: {
-        const node = createChildElement(parent, vnode);
+        const node = createChildElement(parent, index4, vnode);
         this.#createAttributes(node, vnode);
         this.#replaceInnerHtml(node, vnode.inner_html);
         return node;
@@ -3877,7 +4327,7 @@ var Reconciler = class {
           node.removeEventListener(name, handleEvent);
         }
         node.addEventListener(name, handleEvent, {
-          passive: !attribute3.prevent_default
+          passive: prevent.kind === never_kind
         });
         if (throttleDelay > 0) {
           const throttle = throttles.get(name) ?? {};
@@ -3895,27 +4345,10 @@ var Reconciler = class {
           debouncers.delete(name);
         }
         handlers.set(name, (event4) => {
-          if (prevent) event4.preventDefault();
-          if (stop) event4.stopPropagation();
+          if (prevent.kind === always_kind) event4.preventDefault();
+          if (stop.kind === always_kind) event4.stopPropagation();
           const type = event4.type;
-          let path = "";
-          let pathNode = event4.currentTarget;
-          while (pathNode !== this.#root) {
-            const key = pathNode[meta].key;
-            const parent = pathNode.parentNode;
-            if (key) {
-              path = `${separator_key}${key}${path}`;
-            } else {
-              const siblings = parent.childNodes;
-              let index4 = [].indexOf.call(siblings, pathNode);
-              if (parent === this.#root) {
-                index4 -= this.offset;
-              }
-              path = `${separator_index}${index4}${path}`;
-            }
-            pathNode = parent;
-          }
-          path = path.slice(1);
+          const path = event4.currentTarget[meta].path;
           const data = this.#useServerEvents ? createServerEvent(event4, include ?? []) : event4;
           const throttle = throttles.get(type);
           if (throttle) {
@@ -3957,25 +4390,27 @@ var iterate = (list4, callback) => {
 };
 var appendChild = (node, child) => node.appendChild(child);
 var insertBefore = (parent, node, referenceNode) => parent.insertBefore(node, referenceNode ?? null);
-var createChildElement = (parent, { key, tag, namespace }) => {
+var createChildElement = (parent, index4, { key, tag, namespace }) => {
   const node = document().createElementNS(namespace || NAMESPACE_HTML, tag);
-  initialiseMetadata(parent, node, key);
+  initialiseMetadata(parent, node, index4, key);
   return node;
 };
-var createChildText = (parent, { key, content }) => {
+var createChildText = (parent, index4, { key, content }) => {
   const node = document().createTextNode(content ?? "");
-  initialiseMetadata(parent, node, key);
+  initialiseMetadata(parent, node, index4, key);
   return node;
 };
 var createDocumentFragment = () => document().createDocumentFragment();
 var childAt = (node, at) => node.childNodes[at | 0];
 var meta = Symbol("lustre");
-var initialiseMetadata = (parent, node, key = "") => {
+var initialiseMetadata = (parent, node, index4 = 0, key = "") => {
+  const segment = `${key || index4}`;
   switch (node.nodeType) {
     case ELEMENT_NODE:
     case DOCUMENT_FRAGMENT_NODE:
       node[meta] = {
         key,
+        path: segment,
         keyedChildren: /* @__PURE__ */ new Map(),
         handlers: /* @__PURE__ */ new Map(),
         throttles: /* @__PURE__ */ new Map(),
@@ -3986,8 +4421,11 @@ var initialiseMetadata = (parent, node, key = "") => {
       node[meta] = { key };
       break;
   }
-  if (parent && key) {
+  if (parent && parent[meta] && key) {
     parent[meta].keyedChildren.set(key, new WeakRef(node));
+  }
+  if (parent && parent[meta] && parent[meta].path) {
+    node[meta].path = `${parent[meta].path}${separator_element}${segment}`;
   }
 };
 var getKeyedChild = (node, key) => node[meta].keyedChildren.get(key).deref();
@@ -4060,7 +4498,7 @@ var SYNCED_ATTRIBUTES = {
 
 // build/dev/javascript/lustre/lustre/vdom/virtualise.ffi.mjs
 var virtualise = (root3) => {
-  const vdom = virtualiseNode(null, root3);
+  const vdom = virtualiseNode(null, root3, "");
   if (vdom === null || vdom.children instanceof Empty) {
     const empty3 = emptyTextNode(root3);
     root3.appendChild(empty3);
@@ -4078,11 +4516,11 @@ var emptyTextNode = (parent) => {
   initialiseMetadata(parent, node);
   return node;
 };
-var virtualiseNode = (parent, node) => {
+var virtualiseNode = (parent, node, index4) => {
   switch (node.nodeType) {
     case ELEMENT_NODE: {
       const key = node.getAttribute("data-lustre-key");
-      initialiseMetadata(parent, node, key);
+      initialiseMetadata(parent, node, index4, key);
       if (key) {
         node.removeAttribute("data-lustre-key");
       }
@@ -4098,10 +4536,10 @@ var virtualiseNode = (parent, node) => {
       return key ? to_keyed(key, vnode) : vnode;
     }
     case TEXT_NODE:
-      initialiseMetadata(parent, node);
+      initialiseMetadata(parent, node, index4);
       return node.data ? text2(node.data) : null;
     case DOCUMENT_FRAGMENT_NODE:
-      initialiseMetadata(parent, node);
+      initialiseMetadata(parent, node, index4);
       return node.childNodes.length > 0 ? fragment2(virtualiseChildNodes(node)) : null;
     default:
       return null;
@@ -4125,18 +4563,28 @@ var virtualiseInputEvents = (tag, node) => {
   });
 };
 var virtualiseChildNodes = (node) => {
-  let children = empty_list;
-  let child = node.lastChild;
+  let children = null;
+  let index4 = 0;
+  let child = node.firstChild;
+  let ptr = null;
   while (child) {
-    const vnode = virtualiseNode(node, child);
-    const next = child.previousSibling;
+    const vnode = virtualiseNode(node, child, index4);
+    const next = child.nextSibling;
     if (vnode) {
-      children = new NonEmpty(vnode, children);
+      const list_node = new NonEmpty(vnode, null);
+      if (ptr) {
+        ptr = ptr.tail = list_node;
+      } else {
+        ptr = children = list_node;
+      }
+      index4 += 1;
     } else {
       node.removeChild(child);
     }
     child = next;
   }
+  if (!ptr) return empty_list;
+  ptr.tail = empty_list;
   return children;
 };
 var virtualiseAttributes = (node) => {
@@ -4158,7 +4606,6 @@ var virtualiseAttribute = (attr) => {
 
 // build/dev/javascript/lustre/lustre/runtime/client/runtime.ffi.mjs
 var is_browser = () => !!document();
-var is_reference_equal = (a, b) => a === b;
 var Runtime = class {
   constructor(root3, [model, effects], view3, update4) {
     this.root = root3;
@@ -4166,14 +4613,17 @@ var Runtime = class {
     this.#view = view3;
     this.#update = update4;
     this.#reconciler = new Reconciler(this.root, (event4, path, name) => {
-      const [events, msg] = handle(this.#events, path, name, event4);
+      const [events, result] = handle(this.#events, path, name, event4);
       this.#events = events;
-      if (msg.isOk()) {
-        this.dispatch(msg[0], false);
+      if (result.isOk()) {
+        const handler = result[0];
+        if (handler.stop_propagation) event4.stopPropagation();
+        if (handler.prevent_default) event4.preventDefault();
+        this.dispatch(handler.message, false);
       }
     });
     this.#vdom = virtualise(this.root);
-    this.#events = new$5();
+    this.#events = new$3();
     this.#shouldFlush = true;
     this.#tick(effects);
   }
@@ -4287,362 +4737,6 @@ function listAppend(a, b) {
   } else {
     return append(a, b);
   }
-}
-
-// build/dev/javascript/lustre/lustre/vdom/events.mjs
-var Events = class extends CustomType {
-  constructor(handlers, dispatched_paths, next_dispatched_paths) {
-    super();
-    this.handlers = handlers;
-    this.dispatched_paths = dispatched_paths;
-    this.next_dispatched_paths = next_dispatched_paths;
-  }
-};
-function new$5() {
-  return new Events(
-    empty2(),
-    empty_list,
-    empty_list
-  );
-}
-function tick(events) {
-  return new Events(
-    events.handlers,
-    events.next_dispatched_paths,
-    empty_list
-  );
-}
-function do_remove_event(handlers, path, name) {
-  return remove(handlers, event2(path, name));
-}
-function remove_event(events, path, name) {
-  let handlers = do_remove_event(events.handlers, path, name);
-  let _record = events;
-  return new Events(
-    handlers,
-    _record.dispatched_paths,
-    _record.next_dispatched_paths
-  );
-}
-function remove_attributes(handlers, path, attributes) {
-  return fold(
-    attributes,
-    handlers,
-    (events, attribute3) => {
-      if (attribute3 instanceof Event2) {
-        let name = attribute3.name;
-        return do_remove_event(events, path, name);
-      } else {
-        return events;
-      }
-    }
-  );
-}
-function handle(events, path, name, event4) {
-  let next_dispatched_paths = prepend(path, events.next_dispatched_paths);
-  let _block;
-  let _record = events;
-  _block = new Events(
-    _record.handlers,
-    _record.dispatched_paths,
-    next_dispatched_paths
-  );
-  let events$1 = _block;
-  let $ = get(
-    events$1.handlers,
-    path + separator_event + name
-  );
-  if ($ instanceof Ok) {
-    let handler = $[0];
-    return [events$1, run(event4, handler)];
-  } else {
-    return [events$1, new Error(toList([]))];
-  }
-}
-function has_dispatched_events(events, path) {
-  return matches(path, events.dispatched_paths);
-}
-function do_add_event(handlers, mapper, path, name, handler) {
-  return insert3(
-    handlers,
-    event2(path, name),
-    map2(handler, identity2(mapper))
-  );
-}
-function add_event(events, mapper, path, name, handler) {
-  let handlers = do_add_event(events.handlers, mapper, path, name, handler);
-  let _record = events;
-  return new Events(
-    handlers,
-    _record.dispatched_paths,
-    _record.next_dispatched_paths
-  );
-}
-function add_attributes(handlers, mapper, path, attributes) {
-  return fold(
-    attributes,
-    handlers,
-    (events, attribute3) => {
-      if (attribute3 instanceof Event2) {
-        let name = attribute3.name;
-        let handler = attribute3.handler;
-        return do_add_event(events, mapper, path, name, handler);
-      } else {
-        return events;
-      }
-    }
-  );
-}
-function compose_mapper(mapper, child_mapper) {
-  let $ = is_reference_equal(mapper, identity2);
-  let $1 = is_reference_equal(child_mapper, identity2);
-  if ($1) {
-    return mapper;
-  } else if ($) {
-    return child_mapper;
-  } else {
-    return (msg) => {
-      return mapper(child_mapper(msg));
-    };
-  }
-}
-function do_remove_children(loop$handlers, loop$path, loop$child_index, loop$children) {
-  while (true) {
-    let handlers = loop$handlers;
-    let path = loop$path;
-    let child_index = loop$child_index;
-    let children = loop$children;
-    if (children instanceof Empty) {
-      return handlers;
-    } else {
-      let child = children.head;
-      let rest = children.tail;
-      let _pipe = handlers;
-      let _pipe$1 = do_remove_child(_pipe, path, child_index, child);
-      loop$handlers = _pipe$1;
-      loop$path = path;
-      loop$child_index = child_index + advance(child);
-      loop$children = rest;
-    }
-  }
-}
-function do_remove_child(handlers, parent, child_index, child) {
-  if (child instanceof Fragment) {
-    let children = child.children;
-    return do_remove_children(handlers, parent, child_index + 1, children);
-  } else if (child instanceof Element) {
-    let attributes = child.attributes;
-    let children = child.children;
-    let path = add2(parent, child_index, child.key);
-    let _pipe = handlers;
-    let _pipe$1 = remove_attributes(_pipe, path, attributes);
-    return do_remove_children(_pipe$1, path, 0, children);
-  } else if (child instanceof Text) {
-    return handlers;
-  } else {
-    let attributes = child.attributes;
-    let path = add2(parent, child_index, child.key);
-    return remove_attributes(handlers, path, attributes);
-  }
-}
-function remove_child(events, parent, child_index, child) {
-  let handlers = do_remove_child(events.handlers, parent, child_index, child);
-  let _record = events;
-  return new Events(
-    handlers,
-    _record.dispatched_paths,
-    _record.next_dispatched_paths
-  );
-}
-function do_add_children(loop$handlers, loop$mapper, loop$path, loop$child_index, loop$children) {
-  while (true) {
-    let handlers = loop$handlers;
-    let mapper = loop$mapper;
-    let path = loop$path;
-    let child_index = loop$child_index;
-    let children = loop$children;
-    if (children instanceof Empty) {
-      return handlers;
-    } else {
-      let child = children.head;
-      let rest = children.tail;
-      let _pipe = handlers;
-      let _pipe$1 = do_add_child(_pipe, mapper, path, child_index, child);
-      loop$handlers = _pipe$1;
-      loop$mapper = mapper;
-      loop$path = path;
-      loop$child_index = child_index + advance(child);
-      loop$children = rest;
-    }
-  }
-}
-function do_add_child(handlers, mapper, parent, child_index, child) {
-  if (child instanceof Fragment) {
-    let children = child.children;
-    let composed_mapper = compose_mapper(mapper, child.mapper);
-    let child_index$1 = child_index + 1;
-    return do_add_children(
-      handlers,
-      composed_mapper,
-      parent,
-      child_index$1,
-      children
-    );
-  } else if (child instanceof Element) {
-    let attributes = child.attributes;
-    let children = child.children;
-    let path = add2(parent, child_index, child.key);
-    let composed_mapper = compose_mapper(mapper, child.mapper);
-    let _pipe = handlers;
-    let _pipe$1 = add_attributes(_pipe, composed_mapper, path, attributes);
-    return do_add_children(_pipe$1, composed_mapper, path, 0, children);
-  } else if (child instanceof Text) {
-    return handlers;
-  } else {
-    let attributes = child.attributes;
-    let path = add2(parent, child_index, child.key);
-    let composed_mapper = compose_mapper(mapper, child.mapper);
-    return add_attributes(handlers, composed_mapper, path, attributes);
-  }
-}
-function add_child(events, mapper, parent, index4, child) {
-  let handlers = do_add_child(events.handlers, mapper, parent, index4, child);
-  let _record = events;
-  return new Events(
-    handlers,
-    _record.dispatched_paths,
-    _record.next_dispatched_paths
-  );
-}
-function add_children(events, mapper, path, child_index, children) {
-  let handlers = do_add_children(
-    events.handlers,
-    mapper,
-    path,
-    child_index,
-    children
-  );
-  let _record = events;
-  return new Events(
-    handlers,
-    _record.dispatched_paths,
-    _record.next_dispatched_paths
-  );
-}
-
-// build/dev/javascript/lustre/lustre/element.mjs
-function element2(tag, attributes, children) {
-  return element(
-    "",
-    identity2,
-    "",
-    tag,
-    attributes,
-    children,
-    empty2(),
-    false,
-    false
-  );
-}
-function namespaced(namespace, tag, attributes, children) {
-  return element(
-    "",
-    identity2,
-    namespace,
-    tag,
-    attributes,
-    children,
-    empty2(),
-    false,
-    false
-  );
-}
-function text2(content) {
-  return text("", identity2, content);
-}
-function none2() {
-  return text("", identity2, "");
-}
-function count_fragment_children(loop$children, loop$count) {
-  while (true) {
-    let children = loop$children;
-    let count = loop$count;
-    if (children instanceof Empty) {
-      return count;
-    } else {
-      let child = children.head;
-      let rest = children.tail;
-      loop$children = rest;
-      loop$count = count + advance(child);
-    }
-  }
-}
-function fragment2(children) {
-  return fragment(
-    "",
-    identity2,
-    children,
-    empty2(),
-    count_fragment_children(children, 0)
-  );
-}
-function map3(element3, f) {
-  let mapper = identity2(compose_mapper(identity2(f), element3.mapper));
-  if (element3 instanceof Fragment) {
-    let children = element3.children;
-    let keyed_children = element3.keyed_children;
-    let _record = element3;
-    return new Fragment(
-      _record.kind,
-      _record.key,
-      mapper,
-      identity2(children),
-      identity2(keyed_children),
-      _record.children_count
-    );
-  } else if (element3 instanceof Element) {
-    let attributes = element3.attributes;
-    let children = element3.children;
-    let keyed_children = element3.keyed_children;
-    let _record = element3;
-    return new Element(
-      _record.kind,
-      _record.key,
-      mapper,
-      _record.namespace,
-      _record.tag,
-      identity2(attributes),
-      identity2(children),
-      identity2(keyed_children),
-      _record.self_closing,
-      _record.void
-    );
-  } else if (element3 instanceof Text) {
-    return identity2(element3);
-  } else {
-    let attributes = element3.attributes;
-    let _record = element3;
-    return new UnsafeInnerHtml(
-      _record.kind,
-      _record.key,
-      mapper,
-      _record.namespace,
-      _record.tag,
-      identity2(attributes),
-      _record.inner_html
-    );
-  }
-}
-
-// build/dev/javascript/lustre/lustre/element/html.mjs
-function text3(content) {
-  return text2(content);
-}
-function div(attrs, children) {
-  return element2("div", attrs, children);
-}
-function input(attrs) {
-  return element2("input", attrs, empty_list);
 }
 
 // build/dev/javascript/lustre/lustre/runtime/server/runtime.mjs
@@ -4794,10 +4888,12 @@ function is_immediate_event(name) {
 function on(name, handler) {
   return event(
     name,
-    handler,
+    map2(handler, (msg) => {
+      return new Handler(false, false, msg);
+    }),
     empty_list,
-    false,
-    false,
+    never,
+    never,
     is_immediate_event(name),
     0,
     0
