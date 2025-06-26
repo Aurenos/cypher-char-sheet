@@ -72,6 +72,9 @@ pub type Msg {
   UpdateSpeedPoolMax(Int)
   UpdateIntellectPoolCurrent(Int)
   UpdateIntellectPoolMax(Int)
+  AddSkill(Skill)
+  UpdateSkill(Skill)
+  RemoveSkill(Skill)
 }
 
 pub fn update(character: Character, msg: Msg) -> Character {
@@ -117,6 +120,15 @@ pub fn update(character: Character, msg: Msg) -> Character {
         ..character,
         intellect_pool: statpool.update_max(character.intellect_pool, value),
       )
+    AddSkill(_skill) ->
+      // TODO
+      character
+    UpdateSkill(_skill) ->
+      // TODO
+      character
+    RemoveSkill(_skill) ->
+      // TODO
+      character
   }
 }
 

@@ -8,6 +8,7 @@ packages = [
   { name = "exception", version = "2.0.0", build_tools = ["gleam"], requirements = ["gleam_stdlib"], otp_app = "exception", source = "hex", outer_checksum = "F5580D584F16A20B7FCDCABF9E9BE9A2C1F6AC4F9176FA6DD0B63E3B20D450AA" },
   { name = "filepath", version = "1.1.2", build_tools = ["gleam"], requirements = ["gleam_stdlib"], otp_app = "filepath", source = "hex", outer_checksum = "B06A9AF0BF10E51401D64B98E4B627F1D2E48C154967DA7AF4D0914780A6D40A" },
   { name = "fs", version = "11.4.1", build_tools = ["rebar3"], requirements = [], otp_app = "fs", source = "hex", outer_checksum = "DD00A61D89EAC01D16D3FC51D5B0EB5F0722EF8E3C1A3A547CD086957F3260A9" },
+  { name = "glanoid", version = "1.0.1", build_tools = ["gleam"], requirements = ["gleam_crypto", "gleam_stdlib"], otp_app = "glanoid", source = "hex", outer_checksum = "234440F3ED19BD65D166D31CA107991B14C6104AABFC0B75E3581358DCC7D0F3" },
   { name = "gleam_community_ansi", version = "1.4.3", build_tools = ["gleam"], requirements = ["gleam_community_colour", "gleam_regexp", "gleam_stdlib"], otp_app = "gleam_community_ansi", source = "hex", outer_checksum = "8A62AE9CC6EA65BEA630D95016D6C07E4F9973565FA3D0DE68DC4200D8E0DD27" },
   { name = "gleam_community_colour", version = "2.0.1", build_tools = ["gleam"], requirements = ["gleam_json", "gleam_stdlib"], otp_app = "gleam_community_colour", source = "hex", outer_checksum = "F0ACE69E3A47E913B03D3D0BB23A5563A91A4A7D20956916286068F4A9F817FE" },
   { name = "gleam_crypto", version = "1.5.0", build_tools = ["gleam"], requirements = ["gleam_stdlib"], otp_app = "gleam_crypto", source = "hex", outer_checksum = "917BC8B87DBD584830E3B389CBCAB140FFE7CB27866D27C6D0FB87A9ECF35602" },
@@ -43,7 +44,8 @@ packages = [
 ]
 
 [requirements]
-gleam_stdlib = { version = ">= 0.44.0 and < 2.0.0" }
+glanoid = { version = ">= 1.0.1 and < 2.0.0" }
+gleam_stdlib = { version = ">= 0.50.0 and < 2.0.0" }
 gleeunit = { version = ">= 1.0.0 and < 2.0.0" }
 lustre = { version = ">= 5.1.1 and < 6.0.0" }
 lustre_dev_tools = { version = ">= 1.8.2 and < 2.0.0" }
