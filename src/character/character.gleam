@@ -2,12 +2,34 @@ import character/ability.{type Ability}
 import character/cypher.{type Cypher}
 import character/skill.{type Skill}
 import character/statpool.{type StatPool}
+import glanoid
+import gleam/dict.{type Dict}
 import gleam/int
 import gleam/result
 import lustre/attribute
 import lustre/element.{type Element}
 import lustre/element/html
 import lustre/event
+
+const skill_prefix: String = "skill"
+
+const ability_prefix: String = "ability"
+
+const cypher_prefix: String = "cypher"
+
+type SkillID =
+  String
+
+type CypherID =
+  String
+
+type AbilityID =
+  String
+
+fn new_char_entry_id(prefix: String) -> String {
+  let assert Ok(nanoid) = glanoid.make_generator(glanoid.default_alphabet)
+  prefix <> "_" <> nanoid(18)
+}
 
 pub type Character {
   Character(
@@ -24,10 +46,10 @@ pub type Character {
     speed_edge: Int,
     intellect_pool: StatPool,
     intellect_edge: Int,
-    skills: List(Skill),
-    abilities: List(Ability),
+    skills: Dict(SkillID, Skill),
+    abilities: Dict(AbilityID, Ability),
     cypher_limit: Int,
-    cyphers: List(Cypher),
+    cyphers: Dict(CypherID, Cypher),
     // Todo: Items and Inventory
   )
 }
@@ -47,10 +69,10 @@ pub fn new() -> Character {
     speed_edge: 0,
     intellect_pool: statpool.new(),
     intellect_edge: 0,
-    skills: [],
-    abilities: [],
+    skills: dict.new(),
+    abilities: dict.new(),
     cypher_limit: 2,
-    cyphers: [],
+    cyphers: dict.new(),
   )
 }
 
@@ -73,8 +95,14 @@ pub type Msg {
   UpdateIntellectPoolCurrent(Int)
   UpdateIntellectPoolMax(Int)
   AddSkill(Skill)
-  UpdateSkill(Skill)
-  RemoveSkill(Skill)
+  UpdateSkill(SkillID, Skill)
+  RemoveSkill(SkillID)
+  AddCypher(Cypher)
+  UpdateCypher(CypherID, Cypher)
+  RemoveCypher(CypherID)
+  AddAbility(Ability)
+  UpdateAbility(AbilityID, Ability)
+  RemoveAbility(AbilityID)
 }
 
 pub fn update(character: Character, msg: Msg) -> Character {
@@ -120,15 +148,60 @@ pub fn update(character: Character, msg: Msg) -> Character {
         ..character,
         intellect_pool: statpool.update_max(character.intellect_pool, value),
       )
-    AddSkill(_skill) ->
-      // TODO
-      character
-    UpdateSkill(_skill) ->
-      // TODO
-      character
-    RemoveSkill(_skill) ->
-      // TODO
-      character
+    AddSkill(skill) -> {
+      let skills =
+        character.skills
+        |> dict.insert(new_char_entry_id(skill_prefix), skill)
+      Character(..character, skills: skills)
+    }
+    UpdateSkill(skill_id, skill) -> {
+      let skills =
+        character.skills
+        |> dict.insert(skill_id, skill)
+      Character(..character, skills: skills)
+    }
+    RemoveSkill(skill_id) -> {
+      let skills =
+        character.skills
+        |> dict.delete(skill_id)
+      Character(..character, skills: skills)
+    }
+    AddAbility(ability) -> {
+      let abilities =
+        character.abilities
+        |> dict.insert(new_char_entry_id(ability_prefix), ability)
+      Character(..character, abilities: abilities)
+    }
+    UpdateAbility(ability_id, ability) -> {
+      let abilities =
+        character.abilities
+        |> dict.insert(ability_id, ability)
+      Character(..character, abilities: abilities)
+    }
+    RemoveAbility(ability_id) -> {
+      let abilities =
+        character.abilities
+        |> dict.delete(ability_id)
+      Character(..character, abilities: abilities)
+    }
+    AddCypher(cypher) -> {
+      let cyphers =
+        character.cyphers
+        |> dict.insert(new_char_entry_id(cypher_prefix), cypher)
+      Character(..character, cyphers: cyphers)
+    }
+    UpdateCypher(cypher_id, cypher) -> {
+      let cyphers =
+        character.cyphers
+        |> dict.insert(cypher_id, cypher)
+      Character(..character, cyphers: cyphers)
+    }
+    RemoveCypher(cypher_id) -> {
+      let cyphers =
+        character.cyphers
+        |> dict.delete(cypher_id)
+      Character(..character, cyphers: cyphers)
+    }
   }
 }
 

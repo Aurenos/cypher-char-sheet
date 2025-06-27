@@ -8,6 +8,6 @@ pub type Skill {
   Skill(name: String, proficiency: SkillProficiency)
 }
 
-pub fn new() -> Skill {
-  Skill("", Trained)
+pub fn new(name: String) -> Skill {
+  Skill(name, Trained)
 }
