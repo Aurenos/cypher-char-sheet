@@ -353,6 +353,23 @@ function structurallyCompatibleObjects(a, b) {
   if (nonstructural.some((c) => a instanceof c)) return false;
   return a.constructor === b.constructor;
 }
+function remainderInt(a, b) {
+  if (b === 0) {
+    return 0;
+  } else {
+    return a % b;
+  }
+}
+function divideInt(a, b) {
+  return Math.trunc(divideFloat(a, b));
+}
+function divideFloat(a, b) {
+  if (b === 0) {
+    return 0;
+  } else {
+    return a / b;
+  }
+}
 function makeError(variant, file, module, line, fn, message, extra) {
   let error = new globalThis.Error(message);
   error.gleam_error = variant;
@@ -1520,6 +1537,9 @@ function sort(list4, compare4) {
 }
 
 // build/dev/javascript/gleam_stdlib/gleam/string.mjs
+function append2(first, second) {
+  return first + second;
+}
 function concat_loop(loop$strings, loop$accumulator) {
   while (true) {
     let strings = loop$strings;
@@ -1745,15 +1765,21 @@ var NOT_FOUND = {};
 function identity(x) {
   return x;
 }
-function parse_int(value2) {
-  if (/^[-+]?(\d+)$/.test(value2)) {
-    return new Ok(parseInt(value2));
-  } else {
-    return new Error(Nil);
-  }
-}
 function to_string(term) {
   return term.toString();
+}
+function float_to_string(float2) {
+  const string5 = float2.toString().replace("+", "");
+  if (string5.indexOf(".") >= 0) {
+    return string5;
+  } else {
+    const index4 = string5.indexOf("e");
+    if (index4 >= 0) {
+      return string5.slice(0, index4) + ".0" + string5.slice(index4);
+    } else {
+      return string5 + ".0";
+    }
+  }
 }
 function starts_with(haystack, needle) {
   return haystack.startsWith(needle);
@@ -1784,6 +1810,9 @@ var trim_start_regex = /* @__PURE__ */ new RegExp(
 var trim_end_regex = /* @__PURE__ */ new RegExp(`[${unicode_whitespaces}]*$`);
 function new_map() {
   return Dict.new();
+}
+function map_remove(key, map5) {
+  return map5.delete(key);
 }
 function map_get(map5, key) {
   const value2 = map5.get(key, NOT_FOUND);
@@ -1858,6 +1887,9 @@ function string(data) {
 function insert(dict2, key, value2) {
   return map_insert(key, value2, dict2);
 }
+function delete$(dict2, key) {
+  return map_remove(key, dict2);
+}
 
 // build/dev/javascript/gleam_stdlib/gleam/result.mjs
 function is_ok(result) {
@@ -1865,14 +1897,6 @@ function is_ok(result) {
     return true;
   } else {
     return false;
-  }
-}
-function unwrap(result, default$) {
-  if (result instanceof Ok) {
-    let v = result[0];
-    return v;
-  } else {
-    return default$;
   }
 }
 
@@ -2975,6 +2999,9 @@ function text3(content) {
 }
 function div(attrs, children) {
   return element2("div", attrs, children);
+}
+function span(attrs, children) {
+  return element2("span", attrs, children);
 }
 function input(attrs) {
   return element2("input", attrs, empty_list);
@@ -4500,8 +4527,8 @@ var SYNCED_ATTRIBUTES = {
 var virtualise = (root3) => {
   const vdom = virtualiseNode(null, root3, "");
   if (vdom === null || vdom.children instanceof Empty) {
-    const empty3 = emptyTextNode(root3);
-    root3.appendChild(empty3);
+    const empty4 = emptyTextNode(root3);
+    root3.appendChild(empty4);
     return none2();
   } else if (vdom.children instanceof NonEmpty && vdom.children.tail instanceof Empty) {
     return vdom.children.head;
@@ -4865,6 +4892,47 @@ function start3(app, selector, start_args) {
   );
 }
 
+// build/dev/javascript/gleam_time/gleam_time_ffi.mjs
+function system_time() {
+  const now = Date.now();
+  const milliseconds = now % 1e3;
+  const nanoseconds2 = milliseconds * 1e6;
+  const seconds2 = (now - milliseconds) / 1e3;
+  return [seconds2, nanoseconds2];
+}
+
+// build/dev/javascript/gleam_time/gleam/time/timestamp.mjs
+var Timestamp = class extends CustomType {
+  constructor(seconds2, nanoseconds2) {
+    super();
+    this.seconds = seconds2;
+    this.nanoseconds = nanoseconds2;
+  }
+};
+function normalise(timestamp) {
+  let multiplier = 1e9;
+  let nanoseconds2 = remainderInt(timestamp.nanoseconds, multiplier);
+  let overflow = timestamp.nanoseconds - nanoseconds2;
+  let seconds2 = timestamp.seconds + divideInt(overflow, multiplier);
+  let $ = nanoseconds2 >= 0;
+  if ($) {
+    return new Timestamp(seconds2, nanoseconds2);
+  } else {
+    return new Timestamp(seconds2 - 1, multiplier + nanoseconds2);
+  }
+}
+function system_time2() {
+  let $ = system_time();
+  let seconds2 = $[0];
+  let nanoseconds2 = $[1];
+  return normalise(new Timestamp(seconds2, nanoseconds2));
+}
+function to_unix_seconds(timestamp) {
+  let seconds2 = identity(timestamp.seconds);
+  let nanoseconds2 = identity(timestamp.nanoseconds);
+  return seconds2 + divideFloat(nanoseconds2, 1e9);
+}
+
 // build/dev/javascript/lustre/lustre/event.mjs
 function is_immediate_event(name) {
   if (name === "input") {
@@ -5051,6 +5119,71 @@ var UpdateIntellectPoolCurrent = class extends CustomType {
     this[0] = $0;
   }
 };
+var UpdateIntellectPoolMax = class extends CustomType {
+  constructor($0) {
+    super();
+    this[0] = $0;
+  }
+};
+var AddSkill = class extends CustomType {
+  constructor($0) {
+    super();
+    this[0] = $0;
+  }
+};
+var UpdateSkill = class extends CustomType {
+  constructor($0, $1) {
+    super();
+    this[0] = $0;
+    this[1] = $1;
+  }
+};
+var RemoveSkill = class extends CustomType {
+  constructor($0) {
+    super();
+    this[0] = $0;
+  }
+};
+var AddCypher = class extends CustomType {
+  constructor($0) {
+    super();
+    this[0] = $0;
+  }
+};
+var UpdateCypher = class extends CustomType {
+  constructor($0, $1) {
+    super();
+    this[0] = $0;
+    this[1] = $1;
+  }
+};
+var RemoveCypher = class extends CustomType {
+  constructor($0) {
+    super();
+    this[0] = $0;
+  }
+};
+var AddAbility = class extends CustomType {
+  constructor($0) {
+    super();
+    this[0] = $0;
+  }
+};
+var UpdateAbility = class extends CustomType {
+  constructor($0, $1) {
+    super();
+    this[0] = $0;
+    this[1] = $1;
+  }
+};
+function new_char_entry_id(prefix) {
+  let _pipe = system_time2();
+  let _pipe$1 = to_unix_seconds(_pipe);
+  let _pipe$2 = float_to_string(_pipe$1);
+  return ((_capture) => {
+    return append2(prefix, _capture);
+  })(_pipe$2);
+}
 function new$9() {
   return new Character(
     "",
@@ -5066,10 +5199,10 @@ function new$9() {
     0,
     new$8(),
     0,
-    toList([]),
-    toList([]),
+    new_map(),
+    new_map(),
     2,
-    toList([])
+    new_map()
   );
 }
 function update2(character, msg) {
@@ -5180,7 +5313,7 @@ function update2(character, msg) {
       _record.intellect_edge,
       _record.skills,
       _record.abilities,
-      value2,
+      max(2, value2),
       _record.cyphers
     );
   } else if (msg instanceof UpdateXP) {
@@ -5193,7 +5326,7 @@ function update2(character, msg) {
       _record.focus,
       _record.tier,
       _record.effort,
-      value2,
+      max(0, value2),
       _record.might_pool,
       _record.might_edge,
       _record.speed_pool,
@@ -5213,7 +5346,7 @@ function update2(character, msg) {
       _record.descriptor,
       _record.type_,
       _record.focus,
-      value2,
+      max(1, value2),
       _record.effort,
       _record.xp,
       _record.might_pool,
@@ -5236,7 +5369,7 @@ function update2(character, msg) {
       _record.type_,
       _record.focus,
       _record.tier,
-      value2,
+      max(1, value2),
       _record.xp,
       _record.might_pool,
       _record.might_edge,
@@ -5261,7 +5394,7 @@ function update2(character, msg) {
       _record.effort,
       _record.xp,
       _record.might_pool,
-      value2,
+      max(0, value2),
       _record.speed_pool,
       _record.speed_edge,
       _record.intellect_pool,
@@ -5285,7 +5418,7 @@ function update2(character, msg) {
       _record.might_pool,
       _record.might_edge,
       _record.speed_pool,
-      value2,
+      max(0, value2),
       _record.intellect_pool,
       _record.intellect_edge,
       _record.skills,
@@ -5309,7 +5442,7 @@ function update2(character, msg) {
       _record.speed_pool,
       _record.speed_edge,
       _record.intellect_pool,
-      value2,
+      max(0, value2),
       _record.skills,
       _record.abilities,
       _record.cypher_limit,
@@ -5425,7 +5558,7 @@ function update2(character, msg) {
       _record.cypher_limit,
       _record.cyphers
     );
-  } else {
+  } else if (msg instanceof UpdateIntellectPoolMax) {
     let value2 = msg[0];
     let _record = character;
     return new Character(
@@ -5447,86 +5580,305 @@ function update2(character, msg) {
       _record.cypher_limit,
       _record.cyphers
     );
+  } else if (msg instanceof AddSkill) {
+    let skill = msg[0];
+    let _block;
+    let _pipe = character.skills;
+    _block = insert(_pipe, new_char_entry_id("skill"), skill);
+    let skills = _block;
+    let _record = character;
+    return new Character(
+      _record.name,
+      _record.descriptor,
+      _record.type_,
+      _record.focus,
+      _record.tier,
+      _record.effort,
+      _record.xp,
+      _record.might_pool,
+      _record.might_edge,
+      _record.speed_pool,
+      _record.speed_edge,
+      _record.intellect_pool,
+      _record.intellect_edge,
+      skills,
+      _record.abilities,
+      _record.cypher_limit,
+      _record.cyphers
+    );
+  } else if (msg instanceof UpdateSkill) {
+    let skill_id = msg[0];
+    let skill = msg[1];
+    let _block;
+    let _pipe = character.skills;
+    _block = insert(_pipe, skill_id, skill);
+    let skills = _block;
+    let _record = character;
+    return new Character(
+      _record.name,
+      _record.descriptor,
+      _record.type_,
+      _record.focus,
+      _record.tier,
+      _record.effort,
+      _record.xp,
+      _record.might_pool,
+      _record.might_edge,
+      _record.speed_pool,
+      _record.speed_edge,
+      _record.intellect_pool,
+      _record.intellect_edge,
+      skills,
+      _record.abilities,
+      _record.cypher_limit,
+      _record.cyphers
+    );
+  } else if (msg instanceof RemoveSkill) {
+    let skill_id = msg[0];
+    let _block;
+    let _pipe = character.skills;
+    _block = delete$(_pipe, skill_id);
+    let skills = _block;
+    let _record = character;
+    return new Character(
+      _record.name,
+      _record.descriptor,
+      _record.type_,
+      _record.focus,
+      _record.tier,
+      _record.effort,
+      _record.xp,
+      _record.might_pool,
+      _record.might_edge,
+      _record.speed_pool,
+      _record.speed_edge,
+      _record.intellect_pool,
+      _record.intellect_edge,
+      skills,
+      _record.abilities,
+      _record.cypher_limit,
+      _record.cyphers
+    );
+  } else if (msg instanceof AddCypher) {
+    let cypher = msg[0];
+    let _block;
+    let _pipe = character.cyphers;
+    _block = insert(_pipe, new_char_entry_id("cypher"), cypher);
+    let cyphers = _block;
+    let _record = character;
+    return new Character(
+      _record.name,
+      _record.descriptor,
+      _record.type_,
+      _record.focus,
+      _record.tier,
+      _record.effort,
+      _record.xp,
+      _record.might_pool,
+      _record.might_edge,
+      _record.speed_pool,
+      _record.speed_edge,
+      _record.intellect_pool,
+      _record.intellect_edge,
+      _record.skills,
+      _record.abilities,
+      _record.cypher_limit,
+      cyphers
+    );
+  } else if (msg instanceof UpdateCypher) {
+    let cypher_id = msg[0];
+    let cypher = msg[1];
+    let _block;
+    let _pipe = character.cyphers;
+    _block = insert(_pipe, cypher_id, cypher);
+    let cyphers = _block;
+    let _record = character;
+    return new Character(
+      _record.name,
+      _record.descriptor,
+      _record.type_,
+      _record.focus,
+      _record.tier,
+      _record.effort,
+      _record.xp,
+      _record.might_pool,
+      _record.might_edge,
+      _record.speed_pool,
+      _record.speed_edge,
+      _record.intellect_pool,
+      _record.intellect_edge,
+      _record.skills,
+      _record.abilities,
+      _record.cypher_limit,
+      cyphers
+    );
+  } else if (msg instanceof RemoveCypher) {
+    let cypher_id = msg[0];
+    let _block;
+    let _pipe = character.cyphers;
+    _block = delete$(_pipe, cypher_id);
+    let cyphers = _block;
+    let _record = character;
+    return new Character(
+      _record.name,
+      _record.descriptor,
+      _record.type_,
+      _record.focus,
+      _record.tier,
+      _record.effort,
+      _record.xp,
+      _record.might_pool,
+      _record.might_edge,
+      _record.speed_pool,
+      _record.speed_edge,
+      _record.intellect_pool,
+      _record.intellect_edge,
+      _record.skills,
+      _record.abilities,
+      _record.cypher_limit,
+      cyphers
+    );
+  } else if (msg instanceof AddAbility) {
+    let ability = msg[0];
+    let _block;
+    let _pipe = character.abilities;
+    _block = insert(_pipe, new_char_entry_id("ability"), ability);
+    let abilities = _block;
+    let _record = character;
+    return new Character(
+      _record.name,
+      _record.descriptor,
+      _record.type_,
+      _record.focus,
+      _record.tier,
+      _record.effort,
+      _record.xp,
+      _record.might_pool,
+      _record.might_edge,
+      _record.speed_pool,
+      _record.speed_edge,
+      _record.intellect_pool,
+      _record.intellect_edge,
+      _record.skills,
+      abilities,
+      _record.cypher_limit,
+      _record.cyphers
+    );
+  } else if (msg instanceof UpdateAbility) {
+    let ability_id = msg[0];
+    let ability = msg[1];
+    let _block;
+    let _pipe = character.abilities;
+    _block = insert(_pipe, ability_id, ability);
+    let abilities = _block;
+    let _record = character;
+    return new Character(
+      _record.name,
+      _record.descriptor,
+      _record.type_,
+      _record.focus,
+      _record.tier,
+      _record.effort,
+      _record.xp,
+      _record.might_pool,
+      _record.might_edge,
+      _record.speed_pool,
+      _record.speed_edge,
+      _record.intellect_pool,
+      _record.intellect_edge,
+      _record.skills,
+      abilities,
+      _record.cypher_limit,
+      _record.cyphers
+    );
+  } else {
+    let ability_id = msg[0];
+    let _block;
+    let _pipe = character.abilities;
+    _block = delete$(_pipe, ability_id);
+    let abilities = _block;
+    let _record = character;
+    return new Character(
+      _record.name,
+      _record.descriptor,
+      _record.type_,
+      _record.focus,
+      _record.tier,
+      _record.effort,
+      _record.xp,
+      _record.might_pool,
+      _record.might_edge,
+      _record.speed_pool,
+      _record.speed_edge,
+      _record.intellect_pool,
+      _record.intellect_edge,
+      _record.skills,
+      abilities,
+      _record.cypher_limit,
+      _record.cyphers
+    );
   }
 }
-function basic_input(label, value2, update_fn) {
+function name_input(name) {
   return input(
     toList([
-      placeholder(label),
-      class$("m-4 border-black border rounded text-center"),
+      placeholder("Name"),
+      class$(
+        "border-gray-400 border rounded text-center w-1/3 focus:bg-teal-50"
+      ),
       type_("text"),
-      value(value2),
-      on_input(update_fn)
+      value(name),
+      on_input((value2) => {
+        return new UpdateName(value2);
+      })
     ])
   );
 }
-function integer_input(label, value2, update_fn) {
+function descriptor_input(descriptor) {
   return input(
     toList([
-      placeholder(label),
-      class$("m-4 border-black border rounded text-center"),
-      type_("number"),
-      value(to_string(value2)),
-      on_input(
-        (new_value) => {
-          let _pipe = new_value;
-          let _pipe$1 = parse_int(_pipe);
-          let _pipe$2 = unwrap(_pipe$1, value2);
-          return update_fn(_pipe$2);
-        }
-      )
+      placeholder("Descriptor"),
+      class$(
+        "border-gray-400 border rounded text-center w-1/3 focus:bg-teal-50"
+      ),
+      type_("text"),
+      value(descriptor),
+      on_input((value2) => {
+        return new UpdateDescriptor(value2);
+      })
+    ])
+  );
+}
+function focus_input(focus) {
+  return input(
+    toList([
+      placeholder("Focus"),
+      class$(
+        "border-gray-400 border rounded text-center w-2/3 focus:bg-teal-50"
+      ),
+      type_("text"),
+      value(focus),
+      on_input((value2) => {
+        return new UpdateFocus(value2);
+      })
     ])
   );
 }
 function view_character_basics(character) {
   return div(
-    toList([]),
+    toList([class$("m-4 flex justify-between")]),
     toList([
-      basic_input(
-        "Name",
-        character.name,
-        (value2) => {
-          return new UpdateName(value2);
-        }
+      name_input(character.name),
+      span(
+        toList([class$("text-center text-nowrap mx-2")]),
+        toList([text3("is a")])
       ),
-      text3("is a"),
-      basic_input(
-        "Descriptor",
-        character.descriptor,
-        (value2) => {
-          return new UpdateDescriptor(value2);
-        }
+      descriptor_input(character.descriptor),
+      span(
+        toList([class$("text-center mx-2")]),
+        toList([text3("that")])
       ),
-      text3("that"),
-      basic_input(
-        "Focus",
-        character.focus,
-        (value2) => {
-          return new UpdateFocus(value2);
-        }
-      ),
-      integer_input(
-        "Tier",
-        character.tier,
-        (value2) => {
-          return new UpdateTier(value2);
-        }
-      ),
-      integer_input(
-        "XP",
-        character.xp,
-        (value2) => {
-          return new UpdateXP(value2);
-        }
-      ),
-      integer_input(
-        "Effort",
-        character.effort,
-        (value2) => {
-          return new UpdateEffort(value2);
-        }
-      ),
-      div(toList([]), toList([text3(character.name)]))
+      focus_input(character.focus)
     ])
   );
 }
@@ -5557,7 +5909,7 @@ function update3(model, msg) {
 }
 function view2(model) {
   return div(
-    toList([class$("container")]),
+    toList([class$("container-xl")]),
     toList([
       (() => {
         let _pipe = view(model.character);

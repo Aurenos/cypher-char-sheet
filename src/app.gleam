@@ -41,7 +41,7 @@ fn update(model: Model, msg: Msg) -> Model {
 // VIEW ------------------------------------------------------------------------
 
 fn view(model: Model) -> Element(Msg) {
-  html.div([attribute.class("container")], [
+  html.div([attribute.class("container-xl")], [
     char.view(model.character) |> element.map(CharacterMsg),
   ])
 }

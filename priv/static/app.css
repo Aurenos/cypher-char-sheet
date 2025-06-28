@@ -7,6 +7,8 @@
     'Noto Color Emoji';
     --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New',
     monospace;
+    --color-teal-50: oklch(98.4% 0.014 180.72);
+    --color-gray-400: oklch(70.7% 0.022 261.325);
     --color-black: #000;
     --spacing: 0.25rem;
     --default-font-family: var(--font-sans);
@@ -162,26 +164,23 @@
   .static {
     position: static;
   }
-  .container {
-    width: 100%;
-    @media (width >= 40rem) {
-      max-width: 40rem;
-    }
-    @media (width >= 48rem) {
-      max-width: 48rem;
-    }
-    @media (width >= 64rem) {
-      max-width: 64rem;
-    }
-    @media (width >= 80rem) {
-      max-width: 80rem;
-    }
-    @media (width >= 96rem) {
-      max-width: 96rem;
-    }
-  }
   .m-4 {
     margin: calc(var(--spacing) * 4);
+  }
+  .mx-2 {
+    margin-inline: calc(var(--spacing) * 2);
+  }
+  .flex {
+    display: flex;
+  }
+  .w-1\/3 {
+    width: calc(1/3 * 100%);
+  }
+  .w-2\/3 {
+    width: calc(2/3 * 100%);
+  }
+  .justify-between {
+    justify-content: space-between;
   }
   .rounded {
     border-radius: 0.25rem;
@@ -193,12 +192,23 @@
   .border-black {
     border-color: var(--color-black);
   }
+  .border-gray-400 {
+    border-color: var(--color-gray-400);
+  }
   .text-center {
     text-align: center;
+  }
+  .text-nowrap {
+    text-wrap: nowrap;
   }
   .blur {
     --tw-blur: blur(8px);
     filter: var(--tw-blur,) var(--tw-brightness,) var(--tw-contrast,) var(--tw-grayscale,) var(--tw-hue-rotate,) var(--tw-invert,) var(--tw-saturate,) var(--tw-sepia,) var(--tw-drop-shadow,);
+  }
+  .focus\:bg-teal-50 {
+    &:focus {
+      background-color: var(--color-teal-50);
+    }
   }
 }
 @property --tw-border-style {

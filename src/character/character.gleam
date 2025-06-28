@@ -2,34 +2,28 @@ import character/ability.{type Ability}
 import character/cypher.{type Cypher}
 import character/skill.{type Skill}
 import character/statpool.{type StatPool}
-import glanoid
 import gleam/dict.{type Dict}
+import gleam/float
 import gleam/int
 import gleam/result
+import gleam/string
+import gleam/time/timestamp
 import lustre/attribute
 import lustre/element.{type Element}
 import lustre/element/html
 import lustre/event
 
-const skill_prefix: String = "skill"
-
-const ability_prefix: String = "ability"
-
-const cypher_prefix: String = "cypher"
-
-type SkillID =
+type CharacterEntryID =
   String
 
-type CypherID =
-  String
-
-type AbilityID =
-  String
-
-fn new_char_entry_id(prefix: String) -> String {
-  let assert Ok(nanoid) = glanoid.make_generator(glanoid.default_alphabet)
-  prefix <> "_" <> nanoid(18)
+fn new_char_entry_id(prefix: String) -> CharacterEntryID {
+  timestamp.system_time()
+  |> timestamp.to_unix_seconds()
+  |> float.to_string()
+  |> string.append(prefix, _)
 }
+
+// MODEL ----------------------------------------------------------------------
 
 pub type Character {
   Character(
@@ -46,10 +40,10 @@ pub type Character {
     speed_edge: Int,
     intellect_pool: StatPool,
     intellect_edge: Int,
-    skills: Dict(SkillID, Skill),
-    abilities: Dict(AbilityID, Ability),
+    skills: Dict(CharacterEntryID, Skill),
+    abilities: Dict(CharacterEntryID, Ability),
     cypher_limit: Int,
-    cyphers: Dict(CypherID, Cypher),
+    cyphers: Dict(CharacterEntryID, Cypher),
     // Todo: Items and Inventory
   )
 }
@@ -76,6 +70,8 @@ pub fn new() -> Character {
   )
 }
 
+// UPDATE ----------------------------------------------------------------------
+
 pub type Msg {
   UpdateName(String)
   UpdateType(String)
@@ -95,14 +91,14 @@ pub type Msg {
   UpdateIntellectPoolCurrent(Int)
   UpdateIntellectPoolMax(Int)
   AddSkill(Skill)
-  UpdateSkill(SkillID, Skill)
-  RemoveSkill(SkillID)
+  UpdateSkill(CharacterEntryID, Skill)
+  RemoveSkill(CharacterEntryID)
   AddCypher(Cypher)
-  UpdateCypher(CypherID, Cypher)
-  RemoveCypher(CypherID)
+  UpdateCypher(CharacterEntryID, Cypher)
+  RemoveCypher(CharacterEntryID)
   AddAbility(Ability)
-  UpdateAbility(AbilityID, Ability)
-  RemoveAbility(AbilityID)
+  UpdateAbility(CharacterEntryID, Ability)
+  RemoveAbility(CharacterEntryID)
 }
 
 pub fn update(character: Character, msg: Msg) -> Character {
@@ -111,13 +107,17 @@ pub fn update(character: Character, msg: Msg) -> Character {
     UpdateType(value) -> Character(..character, type_: value)
     UpdateDescriptor(value) -> Character(..character, descriptor: value)
     UpdateFocus(value) -> Character(..character, focus: value)
-    UpdateCypherLimit(value) -> Character(..character, cypher_limit: value)
-    UpdateXP(value) -> Character(..character, xp: value)
-    UpdateTier(value) -> Character(..character, tier: value)
-    UpdateEffort(value) -> Character(..character, effort: value)
-    UpdateMightEdge(value) -> Character(..character, might_edge: value)
-    UpdateSpeedEdge(value) -> Character(..character, speed_edge: value)
-    UpdateIntellectEdge(value) -> Character(..character, intellect_edge: value)
+    UpdateCypherLimit(value) ->
+      Character(..character, cypher_limit: int.max(2, value))
+    UpdateXP(value) -> Character(..character, xp: int.max(0, value))
+    UpdateTier(value) -> Character(..character, tier: int.max(1, value))
+    UpdateEffort(value) -> Character(..character, effort: int.max(1, value))
+    UpdateMightEdge(value) ->
+      Character(..character, might_edge: int.max(0, value))
+    UpdateSpeedEdge(value) ->
+      Character(..character, speed_edge: int.max(0, value))
+    UpdateIntellectEdge(value) ->
+      Character(..character, intellect_edge: int.max(0, value))
     UpdateMightPoolCurrent(value) ->
       Character(
         ..character,
@@ -151,7 +151,7 @@ pub fn update(character: Character, msg: Msg) -> Character {
     AddSkill(skill) -> {
       let skills =
         character.skills
-        |> dict.insert(new_char_entry_id(skill_prefix), skill)
+        |> dict.insert(new_char_entry_id("skill"), skill)
       Character(..character, skills: skills)
     }
     UpdateSkill(skill_id, skill) -> {
@@ -169,7 +169,7 @@ pub fn update(character: Character, msg: Msg) -> Character {
     AddAbility(ability) -> {
       let abilities =
         character.abilities
-        |> dict.insert(new_char_entry_id(ability_prefix), ability)
+        |> dict.insert(new_char_entry_id("ability"), ability)
       Character(..character, abilities: abilities)
     }
     UpdateAbility(ability_id, ability) -> {
@@ -187,7 +187,7 @@ pub fn update(character: Character, msg: Msg) -> Character {
     AddCypher(cypher) -> {
       let cyphers =
         character.cyphers
-        |> dict.insert(new_char_entry_id(cypher_prefix), cypher)
+        |> dict.insert(new_char_entry_id("cypher"), cypher)
       Character(..character, cyphers: cyphers)
     }
     UpdateCypher(cypher_id, cypher) -> {
@@ -205,23 +205,57 @@ pub fn update(character: Character, msg: Msg) -> Character {
   }
 }
 
+// VIEW ------------------------------------------------------------------------
+
 pub fn view(character: Character) -> Element(Msg) {
   view_character_basics(character)
 }
 
 fn view_character_basics(character: Character) -> Element(Msg) {
-  html.div([], [
-    basic_input("Name", character.name, fn(value) { UpdateName(value) }),
-    html.text("is a"),
-    basic_input("Descriptor", character.descriptor, fn(value) {
-      UpdateDescriptor(value)
-    }),
-    html.text("that"),
-    basic_input("Focus", character.focus, fn(value) { UpdateFocus(value) }),
-    integer_input("Tier", character.tier, fn(value) { UpdateTier(value) }),
-    integer_input("XP", character.xp, fn(value) { UpdateXP(value) }),
-    integer_input("Effort", character.effort, fn(value) { UpdateEffort(value) }),
-    html.div([], [html.text(character.name)]),
+  html.div([attribute.class("m-4 flex justify-between")], [
+    name_input(character.name),
+    html.span([attribute.class("text-center text-nowrap mx-2")], [
+      html.text("is a"),
+    ]),
+    descriptor_input(character.descriptor),
+    html.span([attribute.class("text-center mx-2")], [html.text("that")]),
+    focus_input(character.focus),
+  ])
+}
+
+fn name_input(name) -> Element(Msg) {
+  html.input([
+    attribute.placeholder("Name"),
+    attribute.class(
+      "border-gray-400 border rounded text-center w-1/3 focus:bg-teal-50",
+    ),
+    attribute.type_("text"),
+    attribute.value(name),
+    event.on_input(fn(value) { UpdateName(value) }),
+  ])
+}
+
+fn descriptor_input(descriptor) -> Element(Msg) {
+  html.input([
+    attribute.placeholder("Descriptor"),
+    attribute.class(
+      "border-gray-400 border rounded text-center w-1/3 focus:bg-teal-50",
+    ),
+    attribute.type_("text"),
+    attribute.value(descriptor),
+    event.on_input(fn(value) { UpdateDescriptor(value) }),
+  ])
+}
+
+fn focus_input(focus) -> Element(Msg) {
+  html.input([
+    attribute.placeholder("Focus"),
+    attribute.class(
+      "border-gray-400 border rounded text-center w-2/3 focus:bg-teal-50",
+    ),
+    attribute.type_("text"),
+    attribute.value(focus),
+    event.on_input(fn(value) { UpdateFocus(value) }),
   ])
 }
 
